@@ -4,10 +4,10 @@ import DashboardPage from "../pages/AdminTemplate/DashboardPage";
 import HomeTemplate from "../pages/HomeTemplate";
 import DetailRoomPage from "../pages/HomeTemplate/DetailRoomPage";
 import HomePage from "../pages/HomeTemplate/HomePage";
-import ListRoomPage from "../pages/HomeTemplate/ListRoomPage";
+import Room from "../pages/HomeTemplate/RoomDetail";
 import { Route } from "react-router-dom";
 import ProfilePage from "../pages/HomeTemplate/ProfilePage";
-
+import User from "./../pages/User";
 type Route = {
   path: string;
   element: React.JSXElementConstructor<any>;
@@ -20,7 +20,7 @@ const routes: Route[] = [
     element: HomeTemplate,
     nested: [
       { path: "", element: HomePage },
-      { path: "list-room", element: ListRoomPage },
+      { path: "room/:id", element: Room },
       { path: "detail/:id", element: DetailRoomPage },
       { path: "profile", element: ProfilePage },
     ],
@@ -33,6 +33,10 @@ const routes: Route[] = [
   {
     path: "auth",
     element: AuthPage,
+  },
+  {
+    path: "user",
+    element: User,
   },
 ];
 

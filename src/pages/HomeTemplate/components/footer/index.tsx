@@ -1,9 +1,9 @@
 export default function Footer() {
   return (
-    <footer className="bg-gray-200 ">
-      <div className="mx-auto w-full  ">
+    <footer className="bg-gray-200">
+      <div className="container mx-auto  ">
         {/* footer top  */}
-        <div className="grid grid-cols-2 gap-8 px-4 py-6 lg:py-8 md:grid-cols-4 mx-20 ">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-2 py-6 lg:py-8 lg:grid-cols-4  mx-15  ">
           <div>
             <h2 className="mb-6 text-sm font-bold  uppercase">Giới thiệu</h2>
             <ul className="text-gray-700 text-md font-sans">
@@ -163,11 +163,11 @@ export default function Footer() {
           </div>
         </div>
         {/* footer bottom  */}
-        <div className=" bg-gray-600  md:flex md:items-center md:justify-between mx-20">
+        <div className=" bg-gray-600  md:flex md:items-center md:justify-between mx-0 xl:mx-20">
           <hr />
         </div>
 
-        <div className="px-4 py-6 text-black  md:flex md:items-center md:justify-between mx-20">
+        <div className=" py-6 text-black  md:flex md:items-center md:justify-between mx-5 md:mx-10">
           <span className="text-sm   sm:text-center">
             © 2025 <a href="https://flowbite.com/">Airbnb, Inc</a>. All Rights
             Reserved . Quyền riêng tư . Điều khoản . Sơ đồ trang Web

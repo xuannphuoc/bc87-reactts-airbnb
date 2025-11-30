@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@floating-ui/react": "^0.27.16",
     "@reduxjs/toolkit": "^2.9.2",
     "@tailwindcss/vite": "^4.1.16",
+    "animate.css": "^4.1.1",
     "axios": "^1.13.0",
     "flowbite": "^3.1.2",
     "react": "^19.1.1",

@@ -2,3 +2,9 @@
 @import "flowbite/src/themes/default";
 @plugin "flowbite/plugin";
 @source "../node_modules/flowbite";
+@import 'animate.css';
+@layer utilities {
+  .fixed.inset-0.z-40.bg-gray-900.bg-opacity-50 {
+    @apply bg-gray-200/80;
+  }
+}
