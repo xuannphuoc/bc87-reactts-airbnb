@@ -9,7 +9,6 @@ type AuthState = {
   error: AxiosError<{ content: string }> | null;
 };
 
-
 const adminInfoString = localStorage.getItem("ADMIN_INFO");
 const adminInfo = adminInfoString ? JSON.parse(adminInfoString) : null;
 
@@ -24,7 +23,7 @@ export const authenLogin = createAsyncThunk(
   async (user: User, { rejectWithValue }) => {
     try {
       const response = await api.post(`auth/signin`, user);
-      const authInfo = response.data.content;
+      const authInfo = response.data.content.user;
       // Check permission user
       if (authInfo.role === "USER" || authInfo.role === "user") {
         return rejectWithValue({

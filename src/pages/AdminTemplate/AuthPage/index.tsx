@@ -20,6 +20,7 @@ export default function AuthPage() {
   });
 
   if (data) {
+    console.log(data);
     return <Navigate to={"/admin/dashboard"} />;
   }
 
@@ -46,7 +47,10 @@ export default function AuthPage() {
           {error?.response?.data.content}
         </div>
       )}
-      <form onSubmit={handleSubmit} className="max-w-sm mx-auto">
+      <form
+        onSubmit={handleSubmit}
+        className="max-w-sm mx-auto my-20 border-2 border-pink-500  border-solid shadow-xl/30 m-5 p-5 border-spacing-2 rounded-md"
+      >
         <div className="mb-5">
           <label
             htmlFor="email"
@@ -77,7 +81,7 @@ export default function AuthPage() {
         </div>
         <button
           type="submit"
-          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 flex justify-center font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-pink-600 dark:hover:bg-pink-700 dark:focus:ring-pink-800"
         >
           Submit
         </button>
