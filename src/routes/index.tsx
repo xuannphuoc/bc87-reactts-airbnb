@@ -7,6 +7,10 @@ import HomePage from "../pages/HomeTemplate/HomePage";
 import ListRoomPage from "../pages/HomeTemplate/ListRoomPage";
 import { Route } from "react-router-dom";
 import ProfilePage from "../pages/HomeTemplate/ProfilePage";
+import ManageUser from "../pages/AdminTemplate/DashboardPage/ManageUser";
+import ManageRoom from "../pages/AdminTemplate/DashboardPage/ManageRoom";
+import ManageLocation from "../pages/AdminTemplate/DashboardPage/ManageLocation";
+import ManageBooking from "../pages/AdminTemplate/DashboardPage/ManageBooking";
 
 type Route = {
   path: string;
@@ -28,7 +32,13 @@ const routes: Route[] = [
   {
     path: "admin",
     element: AdminTemplate,
-    nested: [{ path: "dashboard", element: DashboardPage }],
+    nested: [
+      { path: "dashboard", element: DashboardPage },
+      { path: "user", element: ManageUser },
+      { path: "room", element: ManageRoom },
+      { path: "location", element: ManageLocation },
+      { path: "booking", element: ManageBooking },
+    ],
   },
   {
     path: "auth",
