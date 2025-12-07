@@ -294,7 +294,9 @@ export default function Navbar() {
                             data-modal-toggle="authentication-modal"
                             className="block text-blue-400 w-full text-left px-4 py-2 hover:bg-gray-100"
                           >
-                            Đăng nhập
+                            <i className="fa-solid fa-arrow-left" />
+
+                            <span className="ml-1">Đăng nhập</span>
                           </button>
                         </li>
 
@@ -304,9 +306,15 @@ export default function Navbar() {
                             data-modal-toggle="crypto-modal"
                             className="text-green-500 block w-full text-left px-4 py-2 hover:bg-gray-100"
                           >
-                            Đăng ký
+                            <i className="fa-solid fa-registered" />
+                            <span className="ml-1">Đăng ký</span>
                           </button>
                         </li>
+                        <Link to="/admin">
+                          <button className="text-red-500 block w-full text-left px-4 py-2 hover:bg-gray-100">
+                            <i className="fa-solid fa-circle-user" /> admin
+                          </button>
+                        </Link>
                       </ul>
                     </div>
                   </div>
