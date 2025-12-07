@@ -2,16 +2,11 @@ import AdminTemplate from "../pages/AdminTemplate";
 import AuthPage from "../pages/AdminTemplate/AuthPage";
 import DashboardPage from "../pages/AdminTemplate/DashboardPage";
 import HomeTemplate from "../pages/HomeTemplate";
-import DetailRoomPage from "../pages/HomeTemplate/DetailRoomPage";
+import DetailRoomPage from "../pages/HomeTemplate/ListLocal";
 import HomePage from "../pages/HomeTemplate/HomePage";
-import ListRoomPage from "../pages/HomeTemplate/ListRoomPage";
+import Room from "../pages/HomeTemplate/RoomDetail";
 import { Route } from "react-router-dom";
-import ProfilePage from "../pages/HomeTemplate/ProfilePage";
-import ManageUser from "../pages/AdminTemplate/DashboardPage/ManageUser";
-import ManageRoom from "../pages/AdminTemplate/DashboardPage/ManageRoom";
-import ManageLocation from "../pages/AdminTemplate/DashboardPage/ManageLocation";
-import ManageBooking from "../pages/AdminTemplate/DashboardPage/ManageBooking";
-
+import User from "./../pages/User";
 type Route = {
   path: string;
   element: React.JSXElementConstructor<any>;
@@ -24,9 +19,8 @@ const routes: Route[] = [
     element: HomeTemplate,
     nested: [
       { path: "", element: HomePage },
-      { path: "list-room", element: ListRoomPage },
+      { path: "room/:id", element: Room },
       { path: "detail/:id", element: DetailRoomPage },
-      { path: "profile", element: ProfilePage },
     ],
   },
   {
@@ -43,6 +37,10 @@ const routes: Route[] = [
   {
     path: "auth",
     element: AuthPage,
+  },
+  {
+    path: "user",
+    element: User,
   },
 ];
 
