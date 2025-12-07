@@ -1,7 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../pages/AdminTemplate/AuthPage/slice";
 import userReducer from "./../pages/AdminTemplate/DashboardPage/ManageUser/slice";
-import roomReducer from "./../pages/AdminTemplate/DashboardPage/ManageRoom/silce"
+import roomReducer from "./../pages/AdminTemplate/DashboardPage/ManageRoom/silce";
+import locationReducer from "./../pages/AdminTemplate/DashboardPage/ManageLocation/slice";
 import LocationSlice from "./../pages/HomeTemplate/components/Navbar/slice";
 import getDataPageSlice from "./../pages/HomeTemplate/HomePage/components/Discover/discoverSlice";
 import SignUpReducer from "../pages/HomeTemplate/components/Signup/slice";
@@ -18,6 +19,10 @@ import getUserSlice from "./../pages/User/getRoomByUser";
 import userRoomsSlice from "./../pages/User/roomBooked";
 export const store = configureStore({
   reducer: {
+    authReducer,
+    userReducer,
+    roomReducer,
+    locationReducer,
     LocationSlice,
     getDataPageSlice,
     SignUpReducer,
@@ -33,9 +38,6 @@ export const store = configureStore({
     getUserSlice,
     userRoomsSlice,
   },
-
-
-
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
