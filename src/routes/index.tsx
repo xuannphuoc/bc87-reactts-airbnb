@@ -26,7 +26,13 @@ const routes: Route[] = [
   {
     path: "admin",
     element: AdminTemplate,
-    nested: [{ path: "dashboard", element: DashboardPage }],
+    nested: [
+      { path: "dashboard", element: DashboardPage },
+      { path: "user", element: ManageUser },
+      { path: "room", element: ManageRoom },
+      { path: "location", element: ManageLocation },
+      { path: "booking", element: ManageBooking },
+    ],
   },
   {
     path: "auth",
