@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllUsers,
@@ -13,7 +13,7 @@ interface User {
   id: number;
   name: string;
   email: string;
-  phone: string;
+  phone?: string;
   birthday: string;
   avatar?: string;
   gender: boolean;
@@ -30,22 +30,132 @@ interface FormData {
   role: string;
 }
 
+// ✅ Debounce Hook
+function useDebounce(value: string, delay: number) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// ✅ Modal Component với memo
+const Modal = memo(({ title, children, onClose }: any) => (
+  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="flex items-center justify-between p-4 border-b">
+        <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
+        <button onClick={onClose} className="text-gray-400 hover:text-gray-900">
+          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fillRule="evenodd"
+              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </button>
+      </div>
+      {children}
+    </div>
+  </div>
+));
+
+// ✅ UserRow Component với memo
+const UserRow = memo(({ user, onView, onEdit, onDelete }: any) => (
+  <tr className="bg-white border-b hover:bg-gray-50">
+    <td className="px-6 py-4 font-medium text-gray-900">{user.id}</td>
+    <td className="px-6 py-4">{user.name}</td>
+    <td className="px-6 py-4">{user.email}</td>
+    <td className="px-6 py-4">{user.phone || ""}</td>
+    <td className="px-6 py-4">
+      <span
+        className={`px-2 py-1 text-xs font-medium rounded ${
+          user.gender
+            ? "bg-blue-100 text-blue-800"
+            : "bg-pink-100 text-pink-800"
+        }`}
+      >
+        {user.gender ? "Nam" : "Nữ"}
+      </span>
+    </td>
+    <td className="px-6 py-4">
+      <span
+        className={`px-2 py-1 text-xs font-medium rounded ${
+          user.role === "ADMIN"
+            ? "bg-purple-100 text-purple-800"
+            : "bg-gray-100 text-gray-800"
+        }`}
+      >
+        {user.role}
+      </span>
+    </td>
+    <td className="px-6 py-4">
+      <div className="flex items-center justify-center gap-2">
+        <button
+          onClick={() => onView(user)}
+          className="text-blue-600 hover:text-blue-800"
+          title="Xem"
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+            <path
+              fillRule="evenodd"
+              d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </button>
+        <button
+          onClick={() => onEdit(user)}
+          className="text-yellow-600 hover:text-yellow-800"
+          title="Sửa"
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+          </svg>
+        </button>
+        <button
+          onClick={() => onDelete(user)}
+          className="text-red-600 hover:text-red-800"
+          title="Xóa"
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fillRule="evenodd"
+              d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </button>
+      </div>
+    </td>
+  </tr>
+));
+
 export default function ManageUser() {
-  // Redux
   const dispatch = useDispatch<AppDispatch>();
   const { users, loading, error, success } = useSelector(
     (state: RootState) => state.userReducer
   );
 
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const debouncedSearch = useDebounce(searchInput, 300);
 
-  // Modals
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const [formData, setFormData] = useState<FormData>({
@@ -65,52 +175,60 @@ export default function ManageUser() {
   }, [dispatch]);
 
   useEffect(() => {
-    setFilteredUsers(users);
-  }, [users]);
-
-  useEffect(() => {
     if (success) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         dispatch(clearSuccess());
       }, 3000);
+      return () => clearTimeout(timer);
     }
   }, [success, dispatch]);
 
-  const handleSearch = (value: string) => {
-    setSearchTerm(value);
+  const filteredUsers = useMemo(() => {
+    if (!debouncedSearch) return users;
 
-    if (value) {
-      const filtered = users.filter(
-        (user) =>
-          user.name.toLowerCase().includes(value.toLowerCase()) ||
-          user.email.toLowerCase().includes(value.toLowerCase()) ||
-          user.phone?.includes(value)
-      );
-      setFilteredUsers(filtered);
-    } else {
-      setFilteredUsers(users);
-    }
-  };
+    const lowerSearch = debouncedSearch.toLowerCase();
+    return users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(lowerSearch) ||
+        user.email.toLowerCase().includes(lowerSearch) ||
+        user.phone?.includes(debouncedSearch)
+    );
+  }, [users, debouncedSearch]);
 
-  const validateForm = (isEdit: boolean = false): boolean => {
-    const newErrors: { [key: string]: string } = {};
-    if (!formData.email) newErrors.email = "Email là bắt buộc";
-    else if (!/\S+@\S+\.\S+/.test(formData.email))
-      newErrors.email = "Email không hợp lệ";
-    if (!isEdit && !formData.password)
-      newErrors.password = "Mật khẩu là bắt buộc";
-    else if (formData.password && formData.password.length < 6)
-      newErrors.password = "Mật khẩu phải có ít nhất 6 ký tự";
-    if (!formData.name) newErrors.name = "Họ tên là bắt buộc";
-    if (!formData.phone) newErrors.phone = "Số điện thoại là bắt buộc";
-    else if (!/^[0-9]{10,11}$/.test(formData.phone))
-      newErrors.phone = "Số điện thoại không hợp lệ";
-    if (!formData.gender) newErrors.gender = "Vui lòng chọn giới tính";
-    setFormErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const paginatedUsers = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredUsers.slice(startIndex, endIndex);
+  }, [filteredUsers, currentPage]);
 
-  const resetForm = () => {
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch]);
+
+  const validateForm = useCallback(
+    (isEdit: boolean = false): boolean => {
+      const newErrors: { [key: string]: string } = {};
+      if (!formData.email) newErrors.email = "Email là bắt buộc";
+      else if (!/\S+@\S+\.\S+/.test(formData.email))
+        newErrors.email = "Email không hợp lệ";
+      if (!isEdit && !formData.password)
+        newErrors.password = "Mật khẩu là bắt buộc";
+      else if (formData.password && formData.password.length < 6)
+        newErrors.password = "Mật khẩu phải có ít nhất 6 ký tự";
+      if (!formData.name) newErrors.name = "Họ tên là bắt buộc";
+      if (!formData.phone) newErrors.phone = "Số điện thoại là bắt buộc";
+      else if (!/^[0-9]{10,11}$/.test(formData.phone))
+        newErrors.phone = "Số điện thoại không hợp lệ";
+      if (!formData.gender) newErrors.gender = "Vui lòng chọn giới tính";
+      setFormErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    },
+    [formData]
+  );
+
+  const resetForm = useCallback(() => {
     setFormData({
       email: "",
       password: "",
@@ -121,9 +239,9 @@ export default function ManageUser() {
       role: "USER",
     });
     setFormErrors({});
-  };
+  }, []);
 
-  const handleAddUser = async () => {
+  const handleAddUser = useCallback(async () => {
     if (!validateForm()) return;
 
     const userData = {
@@ -136,18 +254,21 @@ export default function ManageUser() {
       role: formData.role,
     };
 
-    const result = await dispatch(createUser(userData));
-
-    if (createUser.fulfilled.match(result)) {
-      setShowAddModal(false);
-      resetForm();
-      alert("Thêm người dùng thành công!");
-    } else {
-      alert("Lỗi: " + (result.payload as string));
+    try {
+      const result = await dispatch(createUser(userData));
+      if (createUser.fulfilled.match(result)) {
+        setShowAddModal(false);
+        resetForm();
+        alert("Thêm người dùng thành công!");
+      } else {
+        alert("Lỗi: " + (result.payload as string));
+      }
+    } catch (err) {
+      alert("Lỗi: " + err);
     }
-  };
+  }, [dispatch, formData, validateForm, resetForm]);
 
-  const handleEditUser = async () => {
+  const handleEditUser = useCallback(async () => {
     if (!validateForm(true) || !selectedUser) return;
 
     const userData = {
@@ -160,110 +281,65 @@ export default function ManageUser() {
       role: formData.role,
     };
 
-    const result = await dispatch(updateUser(userData));
-
-    if (updateUser.fulfilled.match(result)) {
-      setShowEditModal(false);
-      resetForm();
-      alert("Cập nhật người dùng thành công!");
-    } else {
-      alert("Lỗi: " + (result.payload as string));
+    try {
+      const result = await dispatch(updateUser(userData));
+      if (updateUser.fulfilled.match(result)) {
+        setShowEditModal(false);
+        resetForm();
+        alert("Cập nhật người dùng thành công!");
+      } else {
+        alert("Lỗi: " + (result.payload as string));
+      }
+    } catch (err) {
+      alert("Lỗi: " + err);
     }
-  };
+  }, [dispatch, formData, selectedUser, validateForm, resetForm]);
 
-  const handleDeleteUser = async () => {
+  const handleDeleteUser = useCallback(async () => {
     if (!selectedUser) return;
 
-    const result = await dispatch(deleteUser(selectedUser.id));
-
-    if (deleteUser.fulfilled.match(result)) {
-      setShowDeleteModal(false);
-      setSelectedUser(null);
-      alert("Xóa người dùng thành công!");
-    } else {
-      alert("Lỗi: " + (result.payload as string));
+    try {
+      const result = await dispatch(deleteUser(selectedUser.id));
+      if (deleteUser.fulfilled.match(result)) {
+        setShowDeleteModal(false);
+        setSelectedUser(null);
+        alert("Xóa người dùng thành công!");
+      } else {
+        alert("Lỗi: " + (result.payload as string));
+      }
+    } catch (err) {
+      alert("Lỗi: " + err);
     }
-  };
+  }, [dispatch, selectedUser]);
 
-  const openAddModal = () => {
+  const openAddModal = useCallback(() => {
     resetForm();
     setShowAddModal(true);
-  };
-  const openEditModal = (user: User) => {
+  }, [resetForm]);
+
+  const openEditModal = useCallback((user: User) => {
     setSelectedUser(user);
     setFormData({
-      email: user.email,
+      email: user.email || "",
       password: "",
-      name: user.name,
-      phone: user.phone,
+      name: user.name || "",
+      phone: user.phone || "",
       birthday: user.birthday || "",
       gender: user.gender.toString(),
       role: user.role,
     });
     setShowEditModal(true);
-  };
-  const openViewModal = (user: User) => {
+  }, []);
+
+  const openViewModal = useCallback((user: User) => {
     setSelectedUser(user);
     setShowViewModal(true);
-  };
-  const openDeleteModal = (user: User) => {
+  }, []);
+
+  const openDeleteModal = useCallback((user: User) => {
     setSelectedUser(user);
     setShowDeleteModal(true);
-  };
-
-  const Modal = ({ title, children, onClose }: any) => (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-900"
-          >
-            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-
-  const FormInput = ({
-    label,
-    name,
-    type = "text",
-    required = false,
-    placeholder = "",
-  }: any) => (
-    <div>
-      <label className="block mb-2 text-sm font-medium text-gray-900">
-        {label} {required && <span className="text-red-600">*</span>}
-      </label>
-      <input
-        type={type}
-        name={name}
-        value={formData[name as keyof FormData]}
-        onChange={(e) => {
-          setFormData((prev) => ({ ...prev, [name]: e.target.value }));
-          if (formErrors[name])
-            setFormErrors((prev) => ({ ...prev, [name]: "" }));
-        }}
-        className={`bg-gray-50 border ${
-          formErrors[name] ? "border-red-500" : "border-gray-300"
-        } text-gray-900 text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5`}
-        placeholder={placeholder}
-      />
-      {formErrors[name] && (
-        <p className="mt-2 text-sm text-red-600">{formErrors[name]}</p>
-      )}
-    </div>
-  );
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -334,8 +410,8 @@ export default function ManageUser() {
             </div>
             <input
               type="text"
-              value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full pl-10 p-2.5"
               placeholder="Tìm kiếm theo tên, email, số điện thoại..."
             />
@@ -343,127 +419,170 @@ export default function ManageUser() {
         </div>
 
         <div className="bg-white rounded-lg shadow overflow-hidden">
-          {loading && filteredUsers.length === 0 ? (
+          {loading && paginatedUsers.length === 0 ? (
             <div className="p-8 text-center">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-rose-600"></div>
               <p className="mt-2 text-gray-600">Đang tải...</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left text-gray-500">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3">ID</th>
-                    <th className="px-6 py-3">Họ tên</th>
-                    <th className="px-6 py-3">Email</th>
-                    <th className="px-6 py-3">Số điện thoại</th>
-                    <th className="px-6 py-3">Giới tính</th>
-                    <th className="px-6 py-3">Vai trò</th>
-                    <th className="px-6 py-3 text-center">Hành động</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredUsers.length === 0 ? (
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left text-gray-500">
+                  <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                     <tr>
-                      <td
-                        colSpan={7}
-                        className="px-6 py-8 text-center text-gray-500"
-                      >
-                        Không tìm thấy người dùng nào
-                      </td>
+                      <th className="px-6 py-3">ID</th>
+                      <th className="px-6 py-3">Họ tên</th>
+                      <th className="px-6 py-3">Email</th>
+                      <th className="px-6 py-3">Số điện thoại</th>
+                      <th className="px-6 py-3">Giới tính</th>
+                      <th className="px-6 py-3">Vai trò</th>
+                      <th className="px-6 py-3 text-center">Hành động</th>
                     </tr>
-                  ) : (
-                    filteredUsers.map((user) => (
-                      <tr
-                        key={user.id}
-                        className="bg-white border-b hover:bg-gray-50"
-                      >
-                        <td className="px-6 py-4 font-medium text-gray-900">
-                          {user.id}
-                        </td>
-                        <td className="px-6 py-4">{user.name}</td>
-                        <td className="px-6 py-4">{user.email}</td>
-                        <td className="px-6 py-4">{user.phone}</td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`px-2 py-1 text-xs font-medium rounded ${
-                              user.gender
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-pink-100 text-pink-800"
-                            }`}
-                          >
-                            {user.gender ? "Nam" : "Nữ"}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`px-2 py-1 text-xs font-medium rounded ${
-                              user.role === "ADMIN"
-                                ? "bg-purple-100 text-purple-800"
-                                : "bg-gray-100 text-gray-800"
-                            }`}
-                          >
-                            {user.role}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center justify-center gap-2">
-                            <button
-                              onClick={() => openViewModal(user)}
-                              className="text-blue-600 hover:text-blue-800"
-                              title="Xem"
-                            >
-                              <svg
-                                className="w-5 h-5"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                <path
-                                  fillRule="evenodd"
-                                  d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                            </button>
-                            <button
-                              onClick={() => openEditModal(user)}
-                              className="text-yellow-600 hover:text-yellow-800"
-                              title="Sửa"
-                            >
-                              <svg
-                                className="w-5 h-5"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                              </svg>
-                            </button>
-                            <button
-                              onClick={() => openDeleteModal(user)}
-                              className="text-red-600 hover:text-red-800"
-                              title="Xóa"
-                            >
-                              <svg
-                                className="w-5 h-5"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                            </button>
-                          </div>
+                  </thead>
+                  <tbody>
+                    {paginatedUsers.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={7}
+                          className="px-6 py-8 text-center text-gray-500"
+                        >
+                          Không tìm thấy người dùng nào
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                    ) : (
+                      paginatedUsers.map((user) => (
+                        <UserRow
+                          key={user.id}
+                          user={user}
+                          onView={openViewModal}
+                          onEdit={openEditModal}
+                          onDelete={openDeleteModal}
+                        />
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {totalPages > 1 && (
+                <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                  <div className="flex-1 flex justify-between sm:hidden">
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={currentPage === 1}
+                      className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Trước
+                    </button>
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                      }
+                      disabled={currentPage === totalPages}
+                      className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Sau
+                    </button>
+                  </div>
+                  <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm text-gray-700">
+                        Hiển thị{" "}
+                        <span className="font-medium">
+                          {(currentPage - 1) * itemsPerPage + 1}
+                        </span>{" "}
+                        đến{" "}
+                        <span className="font-medium">
+                          {Math.min(
+                            currentPage * itemsPerPage,
+                            filteredUsers.length
+                          )}
+                        </span>{" "}
+                        trong{" "}
+                        <span className="font-medium">
+                          {filteredUsers.length}
+                        </span>{" "}
+                        kết quả
+                      </p>
+                    </div>
+                    <div>
+                      <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                        <button
+                          onClick={() =>
+                            setCurrentPage((prev) => Math.max(prev - 1, 1))
+                          }
+                          disabled={currentPage === 1}
+                          className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <svg
+                            className="h-5 w-5"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+
+                        {[...Array(Math.min(totalPages, 7))].map((_, i) => {
+                          let pageNum;
+                          if (totalPages <= 7) {
+                            pageNum = i + 1;
+                          } else if (currentPage <= 4) {
+                            pageNum = i + 1;
+                          } else if (currentPage >= totalPages - 3) {
+                            pageNum = totalPages - 6 + i;
+                          } else {
+                            pageNum = currentPage - 3 + i;
+                          }
+
+                          return (
+                            <button
+                              key={i}
+                              onClick={() => setCurrentPage(pageNum)}
+                              className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                                currentPage === pageNum
+                                  ? "z-10 bg-rose-50 border-rose-500 text-rose-600"
+                                  : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                              }`}
+                            >
+                              {pageNum}
+                            </button>
+                          );
+                        })}
+
+                        <button
+                          onClick={() =>
+                            setCurrentPage((prev) =>
+                              Math.min(prev + 1, totalPages)
+                            )
+                          }
+                          disabled={currentPage === totalPages}
+                          className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <svg
+                            className="h-5 w-5"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      </nav>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -474,40 +593,141 @@ export default function ManageUser() {
           >
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormInput
-                  label="Email"
-                  name="email"
-                  type="email"
-                  required
-                  placeholder="example@email.com"
-                />
-                <FormInput
-                  label="Mật khẩu"
-                  name="password"
-                  type="password"
-                  required
-                  placeholder="••••••••"
-                />
-                <FormInput
-                  label="Họ và tên"
-                  name="name"
-                  required
-                  placeholder="Nguyễn Văn A"
-                />
-                <FormInput
-                  label="Số điện thoại"
-                  name="phone"
-                  type="tel"
-                  required
-                  placeholder="0912345678"
-                />
-                <FormInput label="Ngày sinh" name="birthday" type="date" />
+                {/* Email */}
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-900">
+                    Email <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        email: e.target.value,
+                      }));
+                      if (formErrors.email)
+                        setFormErrors((prev) => ({ ...prev, email: "" }));
+                    }}
+                    className={`bg-gray-50 border ${
+                      formErrors.email ? "border-red-500" : "border-gray-300"
+                    } text-gray-900 text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5`}
+                    placeholder="example@email.com"
+                  />
+                  {formErrors.email && (
+                    <p className="mt-2 text-sm text-red-600">
+                      {formErrors.email}
+                    </p>
+                  )}
+                </div>
+
+                {/* Password */}
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-900">
+                    Mật khẩu <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        password: e.target.value,
+                      }));
+                      if (formErrors.password)
+                        setFormErrors((prev) => ({ ...prev, password: "" }));
+                    }}
+                    className={`bg-gray-50 border ${
+                      formErrors.password ? "border-red-500" : "border-gray-300"
+                    } text-gray-900 text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5`}
+                    placeholder="••••••••"
+                  />
+                  {formErrors.password && (
+                    <p className="mt-2 text-sm text-red-600">
+                      {formErrors.password}
+                    </p>
+                  )}
+                </div>
+
+                {/* Name */}
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-900">
+                    Họ và tên <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        name: e.target.value,
+                      }));
+                      if (formErrors.name)
+                        setFormErrors((prev) => ({ ...prev, name: "" }));
+                    }}
+                    className={`bg-gray-50 border ${
+                      formErrors.name ? "border-red-500" : "border-gray-300"
+                    } text-gray-900 text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5`}
+                    placeholder="Nguyễn Văn A"
+                  />
+                  {formErrors.name && (
+                    <p className="mt-2 text-sm text-red-600">
+                      {formErrors.name}
+                    </p>
+                  )}
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-900">
+                    Số điện thoại <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        phone: e.target.value,
+                      }));
+                      if (formErrors.phone)
+                        setFormErrors((prev) => ({ ...prev, phone: "" }));
+                    }}
+                    className={`bg-gray-50 border ${
+                      formErrors.phone ? "border-red-500" : "border-gray-300"
+                    } text-gray-900 text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5`}
+                    placeholder="0912345678"
+                  />
+                  {formErrors.phone && (
+                    <p className="mt-2 text-sm text-red-600">
+                      {formErrors.phone}
+                    </p>
+                  )}
+                </div>
+
+                {/* Birthday */}
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-900">
+                    Ngày sinh
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.birthday}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        birthday: e.target.value,
+                      }))
+                    }
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5"
+                  />
+                </div>
+                {/* Gender */}
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900">
                     Giới tính <span className="text-red-600">*</span>
                   </label>
                   <select
-                    name="gender"
                     value={formData.gender}
                     onChange={(e) => {
                       setFormData((prev) => ({
@@ -531,12 +751,13 @@ export default function ManageUser() {
                     </p>
                   )}
                 </div>
+
+                {/* Role */}
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900">
                     Vai trò
                   </label>
                   <select
-                    name="role"
                     value={formData.role}
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, role: e.target.value }))
@@ -558,9 +779,10 @@ export default function ManageUser() {
               </button>
               <button
                 onClick={handleAddUser}
-                className="text-white bg-rose-600 hover:bg-rose-700 font-medium rounded-lg text-sm px-5 py-2.5"
+                disabled={loading}
+                className="text-white bg-rose-600 hover:bg-rose-700 font-medium rounded-lg text-sm px-5 py-2.5 disabled:opacity-50"
               >
-                Thêm người dùng
+                {loading ? "Đang xử lý..." : "Thêm người dùng"}
               </button>
             </div>
           </Modal>
@@ -573,33 +795,114 @@ export default function ManageUser() {
           >
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormInput
-                  label="Email"
-                  name="email"
-                  type="email"
-                  required
-                  placeholder="example@email.com"
-                />
-                <FormInput
-                  label="Họ và tên"
-                  name="name"
-                  required
-                  placeholder="Nguyễn Văn A"
-                />
-                <FormInput
-                  label="Số điện thoại"
-                  name="phone"
-                  type="tel"
-                  required
-                  placeholder="0912345678"
-                />
-                <FormInput label="Ngày sinh" name="birthday" type="date" />
+                {/* Email */}
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-900">
+                    Email <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        email: e.target.value,
+                      }));
+                      if (formErrors.email)
+                        setFormErrors((prev) => ({ ...prev, email: "" }));
+                    }}
+                    className={`bg-gray-50 border ${
+                      formErrors.email ? "border-red-500" : "border-gray-300"
+                    } text-gray-900 text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5`}
+                    placeholder="example@email.com"
+                  />
+                  {formErrors.email && (
+                    <p className="mt-2 text-sm text-red-600">
+                      {formErrors.email}
+                    </p>
+                  )}
+                </div>
+
+                {/* Name */}
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-900">
+                    Họ và tên <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        name: e.target.value,
+                      }));
+                      if (formErrors.name)
+                        setFormErrors((prev) => ({ ...prev, name: "" }));
+                    }}
+                    className={`bg-gray-50 border ${
+                      formErrors.name ? "border-red-500" : "border-gray-300"
+                    } text-gray-900 text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5`}
+                    placeholder="Nguyễn Văn A"
+                  />
+                  {formErrors.name && (
+                    <p className="mt-2 text-sm text-red-600">
+                      {formErrors.name}
+                    </p>
+                  )}
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-900">
+                    Số điện thoại <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        phone: e.target.value,
+                      }));
+                      if (formErrors.phone)
+                        setFormErrors((prev) => ({ ...prev, phone: "" }));
+                    }}
+                    className={`bg-gray-50 border ${
+                      formErrors.phone ? "border-red-500" : "border-gray-300"
+                    } text-gray-900 text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5`}
+                    placeholder="0912345678"
+                  />
+                  {formErrors.phone && (
+                    <p className="mt-2 text-sm text-red-600">
+                      {formErrors.phone}
+                    </p>
+                  )}
+                </div>
+
+                {/* Birthday */}
+                <div>
+                  <label className="block mb-2 text-sm font-medium text-gray-900">
+                    Ngày sinh
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.birthday}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        birthday: e.target.value,
+                      }))
+                    }
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5"
+                  />
+                </div>
+
+                {/* Gender */}
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900">
                     Giới tính <span className="text-red-600">*</span>
                   </label>
                   <select
-                    name="gender"
                     value={formData.gender}
                     onChange={(e) => {
                       setFormData((prev) => ({
@@ -623,12 +926,13 @@ export default function ManageUser() {
                     </p>
                   )}
                 </div>
+
+                {/* Role */}
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900">
                     Vai trò
                   </label>
                   <select
-                    name="role"
                     value={formData.role}
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, role: e.target.value }))
@@ -650,9 +954,10 @@ export default function ManageUser() {
               </button>
               <button
                 onClick={handleEditUser}
-                className="text-white bg-rose-600 hover:bg-rose-700 font-medium rounded-lg text-sm px-5 py-2.5"
+                disabled={loading}
+                className="text-white bg-rose-600 hover:bg-rose-700 font-medium rounded-lg text-sm px-5 py-2.5 disabled:opacity-50"
               >
-                Cập nhật
+                {loading ? "Đang xử lý..." : "Cập nhật"}
               </button>
             </div>
           </Modal>
@@ -702,7 +1007,7 @@ export default function ManageUser() {
                       Số điện thoại
                     </p>
                     <p className="text-base text-gray-900">
-                      {selectedUser.phone}
+                      {selectedUser.phone || ""}
                     </p>
                   </div>
                   <div>
@@ -779,9 +1084,10 @@ export default function ManageUser() {
               </button>
               <button
                 onClick={handleDeleteUser}
-                className="text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-sm px-5 py-2.5"
+                disabled={loading}
+                className="text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-sm px-5 py-2.5 disabled:opacity-50"
               >
-                Xóa
+                {loading ? "Đang xóa..." : "Xóa"}
               </button>
             </div>
           </Modal>
