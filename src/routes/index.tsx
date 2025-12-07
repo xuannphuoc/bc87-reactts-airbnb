@@ -7,6 +7,10 @@ import HomePage from "../pages/HomeTemplate/HomePage";
 import Room from "../pages/HomeTemplate/RoomDetail";
 import { Route } from "react-router-dom";
 import User from "./../pages/User";
+import ManageRoom from "../pages/AdminTemplate/DashboardPage/ManageRoom";
+import ManageUser from "../pages/AdminTemplate/DashboardPage/ManageUser";
+import ManageLocation from "../pages/AdminTemplate/DashboardPage/ManageLocation";
+import ManageBooking from "../pages/AdminTemplate/DashboardPage/ManageBooking";
 type Route = {
   path: string;
   element: React.JSXElementConstructor<any>;
