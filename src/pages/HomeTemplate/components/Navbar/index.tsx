@@ -88,6 +88,11 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
+    const timer = setTimeout(() => initFlowbite(), 50);
+    return () => clearTimeout(timer);
+  }, [login, mobileOpen, isMobile]);
+
+  useEffect(() => {
     dispatch(getDataLocation());
   }, [dispatch]);
 
@@ -268,14 +273,45 @@ export default function Navbar() {
               {/* Menu / Avatar */}
               <div className="flex items-center gap-2">
                 {!login && (
-                  <button
-                    id="dropdownHoverButton"
-                    data-dropdown-toggle="dropdownHover"
-                    className="w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center hover:bg-gray-100 transition"
-                  >
-                    <i className="fa-solid fa-bars text-gray-800"></i>
-                  </button>
+                  <div className="relative">
+                    <button
+                      id="dropdownHoverButton"
+                      data-dropdown-toggle="dropdownHover"
+                      className="w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center hover:bg-gray-100 transition"
+                    >
+                      <i className="fa-solid fa-bars text-gray-800"></i>
+                    </button>
+
+                    {/* Dropdown MENU LOGIN - SIGNUP */}
+                    <div
+                      id="dropdownHover"
+                      className="hidden absolute right-0 mt-2 w-35 bg-white border border-gray-200 rounded-xl shadow-lg z-50"
+                    >
+                      <ul className="py-2 text-sm text-gray-700 font-medium">
+                        <li>
+                          <button
+                            data-modal-target="authentication-modal"
+                            data-modal-toggle="authentication-modal"
+                            className="block text-blue-400 w-full text-left px-4 py-2 hover:bg-gray-100"
+                          >
+                            Đăng nhập
+                          </button>
+                        </li>
+
+                        <li>
+                          <button
+                            data-modal-target="crypto-modal"
+                            data-modal-toggle="crypto-modal"
+                            className="text-green-500 block w-full text-left px-4 py-2 hover:bg-gray-100"
+                          >
+                            Đăng ký
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
                 )}
+
                 {renderIcon()}
               </div>
 
