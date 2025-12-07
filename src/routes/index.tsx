@@ -2,11 +2,10 @@ import AdminTemplate from "../pages/AdminTemplate";
 import AuthPage from "../pages/AdminTemplate/AuthPage";
 import DashboardPage from "../pages/AdminTemplate/DashboardPage";
 import HomeTemplate from "../pages/HomeTemplate";
-import DetailRoomPage from "../pages/HomeTemplate/DetailRoomPage";
+import DetailRoomPage from "../pages/HomeTemplate/ListLocal";
 import HomePage from "../pages/HomeTemplate/HomePage";
 import Room from "../pages/HomeTemplate/RoomDetail";
 import { Route } from "react-router-dom";
-import ProfilePage from "../pages/HomeTemplate/ProfilePage";
 import User from "./../pages/User";
 type Route = {
   path: string;
@@ -22,7 +21,6 @@ const routes: Route[] = [
       { path: "", element: HomePage },
       { path: "room/:id", element: Room },
       { path: "detail/:id", element: DetailRoomPage },
-      { path: "profile", element: ProfilePage },
     ],
   },
   {

@@ -1,7 +1,7 @@
 import type { AxiosError } from "axios";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import api from "../../../services/apiServices";
-type Room = {
+import axios from "axios";
+export type Room = {
   id: number;
   tenPhong: string;
   khach: number;
@@ -37,7 +37,14 @@ export const getDataRoom = createAsyncThunk(
   "getDataRoom",
   async (id: number, { rejectWithValue }) => {
     try {
-      const response = await api.get(`phong-thue/${id}`);
+      const response = await axios({
+        method: "GET",
+        url: `https://airbnbnew.cybersoft.edu.vn/api/phong-thue/${id}`,
+        headers: {
+          tokenCybersoft:
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCA4NyIsIkhldEhhblN0cmluZyI6IjIzLzAzLzIwMjYiLCJIZXRIYW5UaW1lIjoiMTc3NDIyNDAwMDAwMCIsIm5iZiI6MTc0NzI0MjAwMCwiZXhwIjoxNzc0MzcxNjAwfQ.-W4bvmZuRBJxryMtPHaMnmm11rdGxNTYol7fLRQid1g",
+        },
+      });
       return response.data.content;
     } catch (error) {
       return rejectWithValue(error);

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { AxiosError } from "axios";
-import api from "../../../services/apiServices";
+import api from "../../../../../services/apiServices";
 
 export type Paganation = {
   id: number;

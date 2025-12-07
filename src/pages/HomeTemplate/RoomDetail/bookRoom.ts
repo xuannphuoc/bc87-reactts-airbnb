@@ -2,29 +2,17 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { AxiosError } from "axios";
 import axios from "axios";
 
-interface RoomRent {
-  id: number;
-  tenPhong: string;
-  khach: number;
-  giuong: number;
-  phongTam: number;
-  moTa: string;
-  giaTien: number;
-  mayGiat: boolean;
-  banLa: boolean;
-  tivi: boolean;
-  dieuHoa: boolean;
-  wifi: boolean;
-  bep: boolean;
-  doXe: boolean;
-  hoBoi: boolean;
-  banUi: boolean;
-  maViTri: number;
-  hinhAnh: string;
+export interface FormBookRom {
+  id?: number;
+  maPhong: number;
+  ngayDen: string;
+  ngayDi: string;
+  soLuongKhach: number;
+  maNguoiDung: number;
 }
 
 type InitialState = {
-  data: RoomRent | null;
+  data: FormBookRom | null;
   loading: boolean;
   error: null | AxiosError;
 };
@@ -36,33 +24,33 @@ const initialState: InitialState = {
 };
 
 let token = null;
-const tokenUserStringLocal = localStorage.getItem("userLogin");
-const tokenUserStringSesion = sessionStorage.getItem("userLogin");
-if (tokenUserStringLocal) {
-  const tokenUserString = localStorage.getItem("userLogin");
-  token = tokenUserString ? JSON.parse(tokenUserString) : null;
-} else if (tokenUserStringSesion) {
-  const tokenUserString = localStorage.getItem("userLogin");
-  token = tokenUserString ? JSON.parse(tokenUserString) : null;
+
+const localData = localStorage.getItem("userLogin");
+const sessionData = sessionStorage.getItem("userLogin");
+
+if (localData) {
+  token = JSON.parse(localData).token;
+} else if (sessionData) {
+  token = JSON.parse(sessionData).token;
 }
 
-export const bookRoomReducer = createAsyncThunk(
+export const bookRoomReducer = createAsyncThunk<any, FormBookRom>(
   "bookRoomReducer",
-  async (roomRent, { rejectWithValue }) => {
+  async (data, { rejectWithValue }) => {
     try {
       const response = await axios({
-        url: `https://airbnbnew.cybersoft.edu.vn/api/phong-thue/thue-phong`,
+        url: `https://airbnbnew.cybersoft.edu.vn/api/dat-phong`,
         method: "POST",
-        data: roomRent,
+        data,
         headers: {
-          token,
+          token: `Bearer ${token?.token}`,
           tokenCybersoft:
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCA4NyIsIkhldEhhblN0cmluZyI6IjIzLzAzLzIwMjYiLCJIZXRIYW5UaW1lIjoiMTc3NDIyNDAwMDAwMCIsIm5iZiI6MTc0NzI0MjAwMCwiZXhwIjoxNzc0MzcxNjAwfQ.-W4bvmZuRBJxryMtPHaMnmm11rdGxNTYol7fLRQid1g",
         },
       });
       return response.data.content;
-    } catch (error) {
-      console.log(rejectWithValue(error));
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
@@ -70,7 +58,11 @@ export const bookRoomReducer = createAsyncThunk(
 const bookRoomSlice = createSlice({
   name: "bookRoomSlice",
   initialState,
-  reducers: {},
+  reducers: {
+    reset: (state) => {
+      state.data = null;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(bookRoomReducer.pending, (state) => {
       state.loading = true;
@@ -81,7 +73,7 @@ const bookRoomSlice = createSlice({
     });
     builder.addCase(bookRoomReducer.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.error as AxiosError;
+      state.error = action.payload as AxiosError;
     });
   },
 });

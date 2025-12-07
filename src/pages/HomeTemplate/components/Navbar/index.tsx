@@ -9,6 +9,8 @@ import User from "../../../User";
 import { Link } from "react-router-dom";
 import { getDataRoom } from "./getRoom";
 import { useNavigate } from "react-router-dom";
+import { getRoomByUserReducer } from "./../../../User/getRoomByUser";
+import { getUserReducer } from "./../../../User/getUser";
 export interface UserData {
   id: number;
   name: string;
@@ -31,64 +33,50 @@ export default function Navbar() {
     user: {} as UserData,
     token: "",
   });
-
+  const [showSearch, setShowSearch] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [inputLocaton, setInputLocation] = useState("");
 
+  useEffect(() => {
+    const checkScreen = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkScreen(); // chạy lần đầu khi load
+
+    window.addEventListener("resize", checkScreen);
+    return () => window.removeEventListener("resize", checkScreen);
+  }, []);
+
+  useEffect(() => {
+    if (window.innerWidth >= 768) {
+      let lastY = window.scrollY;
+
+      const handleScroll = () => {
+        if (window.scrollY > lastY) {
+          setShowSearch(false);
+        } else {
+          setShowSearch(true);
+        }
+        lastY = window.scrollY;
+      };
+
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
+  }, []);
   const handleLogin = (userData: User) => {
     setUser(userData);
     setLogin(true);
-    setTimeout(() => {
-      initFlowbite();
-    }, 100);
+    localStorage.setItem("userLogin", JSON.stringify(userData));
+    setTimeout(() => initFlowbite(), 100);
   };
   // give inputLocaton
   const handleSelectLocation = (locationName: string) => {
     setInputLocation(locationName);
     const dropdow = document.getElementById("dropdown");
     if (dropdow) dropdow.classList.add("hidden");
-  };
-
-  // map location
-  const location = useSelector((state: RootState) => state.LocationSlice.data);
-  console.log(location);
-
-  const map: Record<string, string> = {
-    "Quận 1": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/1scrTViw3facDcjHA",
-    "Hòn Rùa": "https://maps.app.goo.gl/1scrTViw3facDcjHA",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
-    "Cái Răng": "https://maps.app.goo.gl/LFGv8JpFQWS8PbMo7",
   };
 
   const dispatch: AppDispatch = useDispatch();
@@ -120,6 +108,7 @@ export default function Navbar() {
   // logout
   const logout = () => {
     localStorage.removeItem("userLogin");
+    sessionStorage.removeItem("userLogin");
     setLogin(false);
     setUser(null);
     setTimeout(() => {
@@ -140,48 +129,43 @@ export default function Navbar() {
     }
   };
 
+  const handleUser = () => {
+    if (user?.user?.id) {
+      dispatch(getRoomByUserReducer(user.user.id));
+      dispatch(getUserReducer(user.user.id));
+    } else {
+      console.log("vui long dang nhap");
+    }
+  };
   const renderIcon = () => {
     return (
-      <div
-        className={`${
-          login ? "block" : "hidden"
-        } shadow-md rounded-full grid place-items-center cursor-pointer`}
-      >
-        <div
+      <div className={`${login ? "block" : "hidden"} relative`}>
+        {/* Avatar */}
+        <button
           id="dropdownDelayButton"
           data-dropdown-toggle="dropdownDelay"
           data-dropdown-delay="500"
           data-dropdown-trigger="hover"
-          className="relative"
+          className="w-10 h-10 rounded-full overflow-hidden shadow-md hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-pink-500"
         >
-          <div className="">
-            {user?.user && user?.user.avatar !== "" ? (
-              <img
-                className="w-10 h-10 rounded-full hover:bg-amber-50"
-                src={user.user.avatar}
-                alt=""
-              />
-            ) : (
-              <img
-                className="w-10 h-10 rounded-full hover:bg-amber-50"
-                src="./images/avatar.png"
-                alt=""
-              />
-            )}
-          </div>
-        </div>
+          <img
+            className="w-full h-full object-cover"
+            src={user?.user?.avatar || "./images/avatar.png"}
+            alt="user avatar"
+          />
+        </button>
+
+        {/* Dropdown */}
         <div
           id="dropdownDelay"
-          className="z-10 hidden bg-neutral-primary-medium border-0 rounded-xl shadow-lg w-36"
+          className="hidden absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-xl shadow-lg z-50"
         >
-          <ul
-            className="p-2 text-sm text-body font-medium"
-            aria-labelledby="dropdownDelayButton"
-          >
+          <ul className="py-2 text-sm text-gray-700 font-medium">
             <li>
               <Link
-                to={"/user"}
-                className="inline-flex items-center hover:bg-gray-100 w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
+                to="/user"
+                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 rounded"
+                onClick={handleUser}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -189,7 +173,7 @@ export default function Navbar() {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-6 h-6 text-blue-500"
+                  className="w-5 h-5 text-blue-500"
                 >
                   <path
                     strokeLinecap="round"
@@ -197,14 +181,13 @@ export default function Navbar() {
                     d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
                   />
                 </svg>
-                <span className="ml-2"> Xem hồ sơ </span>
+                Xem hồ sơ
               </Link>
             </li>
             <li>
-              <a
-                href="#"
-                className="inline-flex items-center hover:bg-gray-100 w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded"
+              <button
                 onClick={logout}
+                className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-gray-100 rounded"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -212,7 +195,7 @@ export default function Navbar() {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-6 h-6 text-red-500"
+                  className="w-5 h-5 text-red-500"
                 >
                   <path
                     strokeLinecap="round"
@@ -220,234 +203,214 @@ export default function Navbar() {
                     d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15"
                   />
                 </svg>
-                <span className="ml-2"> Đăng xuất </span>
-              </a>
+                Đăng xuất
+              </button>
             </li>
           </ul>
         </div>
       </div>
     );
   };
+
   return (
     <div>
-      <nav className="bg-[#FDFDFD] w-full  fixed top-0 start-0 border-b border-gray-200  ">
+      <nav
+        onClick={() => setShowSearch(true)}
+        className="bg-[#FDFDFD] w-full  fixed top-0 start-0 border-b border-gray-200  "
+      >
         <div>
-          <div className="md:grid md:grid-cols-12 flex items-center justify-between mx-auto p-2 max-w-screen-2xl ">
-            {/* left */}
-            <div className="lg:col-span-3 md:col-span-2">
-              <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-                <i className="fa-solid fa-a text-pink-300"></i>
-                <span className="text-pink-300">airbnb</span>
+          <div className="flex flex-wrap items-center justify-between px-4 py-2 max-w-screen-2xl mx-auto md:grid md:grid-cols-12">
+            {/* Left - Logo */}
+            <div className="col-span-2 lg:col-span-3 flex items-center">
+              <span className="text-2xl font-semibold text-pink-300 flex items-center gap-1">
+                <i className="fa-solid fa-a"></i>
+                airbnb
               </span>
             </div>
-            {/* middle */}
-            <div className="lg:col-span-6 md:col-span-8 hidden md:block justify-self-center">
-              <div
-                className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
-                id="navbar-sticky"
-              >
-                <ul className="flex flex-col p-4 gap-0 lg:gap-10 md:p-0 mt-4 font-medium border rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 ">
-                  <li>
-                    <a
-                      href="#"
-                      className="block py-2 px-3 text-gray hover:text-black rounded-sm md:bg-transparent "
-                      aria-current="page"
-                    >
-                      <span className="text-2xl">🏡</span> Nơi lưu trú
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="block py-2 px-3 text-gray hover:text-black rounded-sm md:bg-transparent "
-                    >
-                      <span className="text-2xl">🪂</span> Trải nghiệm
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="block py-2 px-3 text-gray hover:text-black rounded-sm md:bg-transparent "
-                    >
-                      <span className="text-2xl">🛎️</span> Dịch vụ
-                    </a>
-                  </li>
-                </ul>
-              </div>
+
+            {/* Middle - Menu (Desktop) */}
+            <div className="hidden md:flex col-span-8 lg:col-span-6 justify-center">
+              <ul className="flex space-x-6 font-medium text-gray-700">
+                <li>
+                  <a
+                    href="#"
+                    className="flex items-center gap-1 hover:text-black"
+                  >
+                    <span className="text-2xl">🏡</span> Nơi lưu trú
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="flex items-center gap-1 hover:text-black"
+                  >
+                    <span className="text-2xl">🪂</span> Trải nghiệm
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="flex items-center gap-1 hover:text-black"
+                  >
+                    <span className="text-2xl">🛎️</span> Dịch vụ
+                  </a>
+                </li>
+              </ul>
             </div>
 
-            {/* right */}
-            <div className="justify-self-end md:col-span-2 lg:col-span-3 mr-5">
-              <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-                <div className="hidden md:block">
-                  <div className="flex  items-center gap-4">
-                    <div className="text-black md:hidden lg:block">
-                      Đón tiếp khách
-                    </div>
-                    <div className="w-10 h-10 bg-gray-100 text-black rounded-full shadow-md flex items-center justify-center cursor-pointer">
-                      <i className="fa-solid fa-globe text-gray-800"></i>
-                    </div>
-                    {/* icon avatar  */}
-                    <div className="py-1 px-2 rounded-4xl bg-gray-100">
-                      <div className="flex justify-around gap-1">
-                        {!login && (
-                          <div className=" h-10 w-10 bg-white hover:bg-white/30 shadow-md rounded-full grid place-items-center cursor-pointer  ">
-                            <div
-                              id="dropdownHoverButton"
-                              data-dropdown-toggle="dropdownHover"
-                              data-dropdown-trigger="hover"
-                              className=""
-                            >
-                              <i className="fa-solid fa-bars text-gray-800  "></i>
-                            </div>
-                          </div>
-                        )}
+            {/* Right - Actions */}
+            <div className="col-span-2 lg:col-span-3 flex items-center justify-end space-x-3">
+              {/* Globe icon */}
+              <button className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shadow-md hover:shadow-lg transition">
+                <i className="fa-solid fa-globe text-gray-800"></i>
+              </button>
 
-                        {renderIcon()}
-                      </div>
-                    </div>
-
-                    <div
-                      id="dropdownHover"
-                      className="z-10  hidden bg-white  rounded-lg shadow-sm w-35 mt-5 "
-                    >
-                      <ul
-                        className="py-2 text-sm text-black "
-                        aria-labelledby="dropdownHoverButton"
-                      >
-                        <li>
-                          <a
-                            data-modal-target="authentication-modal"
-                            data-modal-toggle="authentication-modal"
-                            href="#"
-                            className="block px-4 py-2 hover:bg-gray-100  "
-                          >
-                            <i className="fa-solid fa-right-to-bracket text-green-700"></i>
-                            <span> Đăng nhập </span>
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="block px-4 py-2 hover:bg-gray-100  "
-                            data-modal-target="crypto-modal"
-                            data-modal-toggle="crypto-modal"
-                          >
-                            <i className="fa-solid fa-address-book text-blue-700 "></i>
-                            <span> Đăng ký</span>
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  data-collapse-toggle="navbar-sticky"
-                  type="button"
-                  className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-                  aria-controls="navbar-sticky"
-                  aria-expanded="false"
-                >
-                  <span className="sr-only">Open main menu</span>
-                  <svg
-                    className="w-5 h-5"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 17 14"
+              {/* Menu / Avatar */}
+              <div className="flex items-center gap-2">
+                {!login && (
+                  <button
+                    id="dropdownHoverButton"
+                    data-dropdown-toggle="dropdownHover"
+                    className="w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center hover:bg-gray-100 transition"
                   >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M1 1h15M1 7h15M1 13h15"
-                    />
-                  </svg>
-                </button>
+                    <i className="fa-solid fa-bars text-gray-800"></i>
+                  </button>
+                )}
+                {renderIcon()}
               </div>
+
+              {/* Mobile Hamburger */}
+              <button
+                onClick={() => setMobileOpen(!mobileOpen)}
+                className="md:hidden inline-flex items-center justify-center w-10 h-10 text-gray-500 rounded-lg hover:bg-gray-100"
+              >
+                <span className="sr-only">Open main menu</span>
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 17 14"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M1 1h15M1 7h15M1 13h15"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
-
-          <div className="items-center justify-center container mx-auto  hidden md:flex">
-            <div className="sm:flex bg-[#FFFFFF] rounded-full shadow-sm overflow-hidden items-stretch hidden md:w-[90%] lg:w-[70%] xl:w-[55%] mb-2">
-              {/* Địa điểm */}
-              <div className="relative">
-                <div
-                  id="dropdownDefaultButton"
-                  data-dropdown-toggle="dropdown"
-                  className={`
-                  }w-full rounded-full relative flex items-center px-6 py-3 hover:bg-gray-100 transition after:content-[''] after:absolute after:top-1/2 after:right-0 after:translate-y-[-50%] after:h-[60%] after:w-px after:bg-gray-300`}
-                >
-                  <div className="w-full text-left">
-                    <label className="block text-sm font-semibold text-gray-800">
-                      Địa điểm
-                    </label>
-                    <input
-                      value={inputLocaton}
-                      onChange={(e) => setInputLocation(e.target.value)}
-                      id="diaDiem"
-                      type="text"
-                      placeholder="Tìm kiếm điểm đến"
-                      className="bg-transparent focus:ring-0 focus:outline-none border-none text-sm placeholder:text-gray-500 w-full p-0 m-0 cursor-pointer"
-                    />
-                  </div>
+          <div
+            className={`
+    container mx-auto transition-all duration-300 justify-center 
+    ${
+      isMobile
+        ? mobileOpen
+          ? "flex"
+          : "hidden"
+        : showSearch
+        ? "flex"
+        : "hidden"
+    }
+  `}
+          >
+            <div
+              className="
+      w-full md:w-[90%] lg:w-[70%] xl:w-[55%]
+      bg-white rounded-2xl md:rounded-full shadow-md 
+      overflow-hidden 
+      flex flex-col md:flex-row
+      gap-3 md:gap-0
+      p-4 md:p-0
+    "
+            >
+              {/* Place */}
+              <div
+                id="dropdownDefaultButton"
+                data-dropdown-toggle="dropdown"
+                className="
+        flex-1 relative flex items-center px-4 py-3 
+        hover:bg-gray-100 md:bg-transparent rounded-xl md:rounded-none
+        md:after:content-[''] md:after:absolute md:after:top-1/2 
+        md:after:right-0 md:after:-translate-y-1/2 
+        md:after:h-[60%] md:after:w-px md:after:bg-gray-300
+        cursor-pointer
+      "
+              >
+                <div className="w-full text-left">
+                  <label className="block text-xs font-semibold text-gray-800">
+                    Địa điểm
+                  </label>
+                  <input
+                    value={inputLocaton}
+                    onChange={(e) => setInputLocation(e.target.value)}
+                    id="diaDiem"
+                    type="text"
+                    placeholder="Tìm kiếm điểm đến"
+                    className="bg-transparent focus:ring-0 focus:outline-none border-none text-sm placeholder:text-gray-500 w-full cursor-pointer"
+                  />
                 </div>
               </div>
-              {/* Nhận phòng */}
+
+              {/* Check-in */}
               <div
-                id="nhanPhong"
-                className={`
-               
-                  rounded-full relative flex-[0.8] items-center px-6 py-3 hover:bg-gray-100 transition after:content-[''] after:absolute after:top-1/2 after:right-0 after:translate-y-[-50%] after:h-[60%] after:w-px after:bg-gray-300`}
+                className="
+        flex-1 relative flex items-center px-4 py-3 
+        hover:bg-gray-100 md:bg-transparent rounded-xl md:rounded-none
+        md:after:content-[''] md:after:absolute md:after:top-1/2 
+        md:after:right-0 md:after:-translate-y-1/2 
+        md:after:h-[60%] md:after:w-px md:after:bg-gray-300
+      "
               >
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800">
+                  <label className="block text-xs font-semibold text-gray-800">
                     Nhận phòng
                   </label>
                   <input
                     type="date"
-                    className="bg-transparent focus:ring-0 focus:outline-none border-none text-sm placeholder:text-gray-500 w-full p-0 m-0 cursor-pointer"
+                    className="bg-transparent focus:ring-0 focus:outline-none border-none text-sm w-full cursor-pointer"
                   />
                 </div>
               </div>
 
-              {/* Trả phòng */}
+              {/* Check-out */}
               <div
-                id="traPhong"
-                className="rounded-full relative flex-[0.8] items-center px-6 py-3 hover:bg-gray-100 transition after:content-[''] after:absolute after:top-1/2 after:right-0 after:translate-y-[-50%] after:h-[60%] after:w-px after:bg-gray-300"
+                className="
+        flex-1 relative flex items-center px-4 py-3 
+        hover:bg-gray-100 md:bg-transparent rounded-xl md:rounded-none
+        md:after:content-[''] md:after:absolute md:after:top-1/2 
+        md:after:right-0 md:after:-translate-y-1/2 
+        md:after:h-[60%] md:after:w-px md:after:bg-gray-300
+      "
               >
                 <div>
-                  <label className="block text-sm font-semibold text-gray-800">
+                  <label className="block text-xs font-semibold text-gray-800">
                     Trả phòng
                   </label>
                   <input
                     type="date"
-                    className="bg-transparent focus:ring-0 focus:outline-none border-none text-sm placeholder:text-gray-500 w-full p-0 m-0 cursor-pointer"
+                    className="bg-transparent focus:ring-0 focus:outline-none border-none text-sm w-full cursor-pointer"
                   />
                 </div>
               </div>
 
-              {/* Khách */}
-              <div
-                id="khách"
-                className="flex-[1.2] items-center px-6 py-3 hover:bg-gray-100 rounded-full transition"
-              >
-                <div className="flex items-center justify-around md:gap-5">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-800">
-                      Khách
-                    </label>
-                    <span className="text-sm text-gray-500">Thêm khách</span>
-                  </div>
-                  <button
-                    onClick={senId}
-                    className="cursor-pointer bg-pink-600 text-white rounded-full w-10 h-10 text-sm font-semibold hover:bg-pink-700 transition "
-                  >
-                    <i className="fa-solid fa-magnifying-glass"></i>
-                  </button>
+              {/* Guests + Search Button */}
+              <div className="flex items-center justify-between px-4 py-3 hover:bg-gray-100 rounded-xl md:rounded-none flex-1">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-800">
+                    Khách
+                  </label>
+                  <span className="text-sm text-gray-500">Thêm khách</span>
                 </div>
+
+                <button
+                  onClick={senId}
+                  className="cursor-pointer bg-pink-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-pink-700 transition"
+                >
+                  <i className="fa-solid fa-magnifying-glass"></i>
+                </button>
               </div>
             </div>
           </div>

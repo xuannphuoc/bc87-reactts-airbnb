@@ -1,11 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
 import { type AppDispatch, type RootState } from "../../../store";
-import { type Comments } from "../DetailRoomPage/getComment";
+import { type Comments } from "../ListLocal/getComment.ts";
 import { useState } from "react";
 import StarRating from "../RoomDetail/Rating";
 import { postComment } from "./postComment";
 import { type PostComment } from "./postComment";
 import { useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { bookRoomReducer } from "./bookRoom";
+import { type FormBookRom } from "./bookRoom";
+import { initFlowbite, Modal } from "flowbite";
 type Props = {
   cmt: Comments;
 };
@@ -91,22 +95,32 @@ const CommentComponent = ({ cmt }: Props) => {
 export default function Room() {
   const roomData = useSelector((state: RootState) => state.getDataRoomSlice);
   const comment = useSelector((state: RootState) => state.commentSlice.data);
-  const distpatch = useDispatch<AppDispatch>();
-  const [data, setData] = useState<PostComment>({
-    maPhong: 0,
-    maNguoiBinhLuan: 0,
-    ngayBinhLuan: "",
-    noiDung: "",
-    saoBinhLuan: 0,
-  });
-  console.log(comment);
-  useEffect(() => {
-    if (roomData.data && comment && comment.length > 0) {
-      sessionStorage.setItem("dataRoom", JSON.stringify(roomData.data));
-      sessionStorage.setItem("dataComment", JSON.stringify(comment));
-    }
-  }, [roomData.data, comment]);
+  const [showPopupSucess, setShowPopupSucess] = useState(false);
 
+  const bookRoomState = useSelector((state: RootState) => state.bookRoomSlice);
+
+  useEffect(() => {
+    if (bookRoomState.data) {
+      setShowPopupSucess(true);
+    }
+  }, [bookRoomState.data]);
+  // comment
+  const postCommentState = useSelector(
+    (state: RootState) => state.postCommentReducer
+  );
+  const notify = postCommentState;
+  console.log(notify);
+  // get maPhong
+  const { id: maPhong } = useParams();
+  //  get user
+
+  const userString =
+    localStorage.getItem("userLogin") || sessionStorage.getItem("userLogin");
+
+  const user = userString ? JSON.parse(userString) : null;
+  const userData = user?.user ?? null;
+
+  // get Room
   let room = null;
   if (roomData.data) {
     room = roomData.data;
@@ -116,7 +130,13 @@ export default function Room() {
       room = JSON.parse(stored);
     }
   }
-
+  const distpatch = useDispatch<AppDispatch>();
+  useEffect(() => {
+    if (roomData.data && comment && comment.length > 0) {
+      sessionStorage.setItem("dataRoom", JSON.stringify(roomData.data));
+      sessionStorage.setItem("dataComment", JSON.stringify(comment));
+    }
+  }, [roomData.data, comment]);
   useEffect(() => {
     if (!comment || comment.length === 0) {
       const stored = sessionStorage.getItem("dataComment");
@@ -129,61 +149,126 @@ export default function Room() {
       }
     }
   }, []);
-
-  console.log(room);
-  // getUser
-  let userJson = null;
-
-  const userStringLocal = localStorage.getItem("userLogin");
-  const userStringSession = sessionStorage.getItem("userLogin");
-  if (userStringLocal) {
-    userJson = JSON.parse(userStringLocal);
-  } else if (userStringSession) {
-    userJson = JSON.parse(userStringSession);
-  }
-
   const renderComment = () => {
     return comment?.map((cmt: Comments) => {
       return <CommentComponent key={cmt.id} cmt={cmt} />;
     });
   };
+  const [form, setForm] = useState<FormBookRom>({
+    maPhong: Number(maPhong),
+    ngayDen: "",
+    ngayDi: "",
+    soLuongKhach: 1,
+    maNguoiDung: userData?.id ?? 0,
+  });
+  // comment
+  const isdate = new Date();
+  const [data, setData] = useState<PostComment>({
+    maPhong: Number(maPhong),
+    maNguoiBinhLuan: userData?.id ?? 0,
+    ngayBinhLuan: `${isdate.getDate()}/${isdate.getMonth()}/${isdate.getFullYear()}T00:00:00`,
+    noiDung: "",
+    saoBinhLuan: 0,
+  });
+  console.log(data);
+  // post form
+  useEffect(() => {
+    initFlowbite();
+  }, []);
+  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const userString =
+      localStorage.getItem("userLogin") || sessionStorage.getItem("userLogin");
+
+    const user = userString ? JSON.parse(userString) : null;
+    console.log(user);
+    const userData = user?.user ?? null;
+    if (!userData) {
+      alert("Bạn cần đăng nhập để tiếp tục!");
+
+      // mở modal đăng nhập
+      const modalEl = document.getElementById("authentication-modal");
+      if (modalEl) {
+        const modal = new Modal(modalEl, {
+          placement: "center",
+          backdrop: "dynamic",
+          closable: true,
+        });
+        modal.show();
+      } else {
+        document
+          .getElementById("authentication-modal")
+          ?.classList.add("hidden");
+      }
+
+      return;
+    }
+    distpatch(bookRoomReducer(form));
+  };
+  // calc money
+
+  const [money, setMoney] = useState({
+    usd: room?.giaTien,
+    day: 0,
+    moneyService: 3,
+  });
+  useEffect(() => {
+    if (form.ngayDen && form.ngayDi) {
+      const startDate = new Date(form.ngayDen);
+      const endDate = new Date(form.ngayDi);
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(0, 0, 0, 0);
+
+      const diffDay =
+        (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+
+      setMoney((prev) => ({
+        ...prev,
+        day: diffDay > 0 ? diffDay : 0,
+      }));
+    }
+  }, [form.ngayDen, form.ngayDi]);
+
   return (
-    <div className="container mx-auto my-10">
+    <div className="container mx-auto my-10 p-5">
       <hr className="my-2" />
       <div className="">
         {room && (
-          <div className="">
-            <h1 className="text-2xl mb-2 font-semibold">{room.tenPhong}</h1>
-            <div
-              className="
-            // grid place-items-center
-            "
-            >
+          <div className="w-full">
+            {/* Tên phòng */}
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-3">
+              {room.tenPhong}
+            </h1>
+
+            {/* Hình ảnh */}
+            <div className="w-full">
               <img
                 src={room.hinhAnh}
                 alt=""
-                className="rounded-2xl max-w-full max-h-full"
+                className="rounded-2xl w-full max-h-[450px] object-cover"
               />
             </div>
-            <div className="my-10">
-              <h1 className="text-lg ">
-                Toàn bộ căn hộ, chủ nhà <b>{userJson?.name}</b>
+
+            {/* Thông tin chủ nhà */}
+            <div className="mt-6 sm:mt-8">
+              <h1 className="text-base sm:text-lg">
+                Toàn bộ căn hộ, chủ nhà <b>{userData?.name}</b>
               </h1>
-              <div className="mt-2">
-                <p className="text-gray-700 text-sm">
-                  {room.khach} khách . {room.phongNgu} phòng ngủ . {room.giuong}{" "}
-                  gường . {room.phongTam} phòng tắm
-                </p>
-              </div>
+
+              <p className="text-gray-700 text-sm sm:text-base mt-2 leading-relaxed">
+                {room.khach} khách · {room.phongNgu} phòng ngủ · {room.giuong}{" "}
+                giường · {room.phongTam} phòng tắm
+              </p>
             </div>
           </div>
         )}
         {room && (
-          <div className="grid grid-cols-12 gap-10">
-            <div className="col-span-8">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10">
+            {/* LEFT CONTENT (giữ nguyên logic) */}
+            <div className="md:col-span-8">
               <hr className="text-gray-600" />
-              <div className="my-10">
-                <div className="flex gap-5 items-center mb-7">
+              <div className="my-6 md:my-10">
+                <div className="flex gap-3 md:gap-5 items-center mb-6 md:mb-7">
                   {/* icon  */}
                   <div className="">
                     <svg
@@ -192,7 +277,7 @@ export default function Room() {
                       viewBox="0 0 24 24"
                       strokeWidth={1.5}
                       stroke="currentColor"
-                      className="size-6"
+                      className="w-6 h-6 md:w-7 md:h-7"
                     >
                       <path
                         strokeLinecap="round"
@@ -203,13 +288,14 @@ export default function Room() {
                   </div>
                   {/* content  */}
                   <div className="">
-                    <h4 className="text-md">Toàn bộ nhà</h4>
-                    <p className="text-gray-700 text-sm">
+                    <h4 className="text-md md:text-base">Toàn bộ nhà</h4>
+                    <p className="text-gray-700 text-sm md:text-sm">
                       Bạn sẽ có chung cư cao cấp cho riêng mình
                     </p>
                   </div>
                 </div>
-                <div className="flex gap-5 items-center mb-7">
+
+                <div className="flex gap-3 md:gap-5 items-center mb-6 md:mb-7">
                   {/* icon  */}
                   <div className="">
                     <svg
@@ -218,7 +304,7 @@ export default function Room() {
                       viewBox="0 0 24 24"
                       strokeWidth={1.5}
                       stroke="currentColor"
-                      className="size-6"
+                      className="w-6 h-6 md:w-7 md:h-7"
                     >
                       <path
                         strokeLinecap="round"
@@ -229,15 +315,21 @@ export default function Room() {
                   </div>
                   {/* content  */}
                   <div className="">
-                    <h4 className="text-md">Vệ sinh tăng cường</h4>
-                    <p className="text-gray-700 text-sm">
+                    <h4 className="text-md md:text-base">Vệ sinh tăng cường</h4>
+                    <p className="text-gray-700 text-sm md:text-sm">
                       Chủ nhà này đã cam kết thực hiện quy trình vệ sinh tăng
                       cường 5 bước Aribnb.
                     </p>
-                    <a href="font-bold">Hiển thị thêm</a>
+                    <a
+                      href="font-bold"
+                      className="text-sm md:text-sm underline"
+                    >
+                      Hiển thị thêm
+                    </a>
                   </div>
                 </div>
-                <div className="flex gap-5 items-center mb-7">
+
+                <div className="flex gap-3 md:gap-5 items-center mb-6 md:mb-7">
                   {/* icon  */}
                   <div className="">
                     <svg
@@ -246,7 +338,7 @@ export default function Room() {
                       viewBox="0 0 24 24"
                       strokeWidth={1.5}
                       stroke="currentColor"
-                      className="size-6"
+                      className="w-6 h-6 md:w-7 md:h-7"
                     >
                       <path
                         strokeLinecap="round"
@@ -257,15 +349,18 @@ export default function Room() {
                   </div>
                   {/* content  */}
                   <div className="">
-                    <h4 className="text-md">Phong là chủ nhà siêu cấp</h4>
-                    <p className="text-gray-700 text-sm">
+                    <h4 className="text-md md:text-base">
+                      Phong là chủ nhà siêu cấp
+                    </h4>
+                    <p className="text-gray-700 text-sm md:text-sm">
                       Chủ nhà siêu cấp là chủ nhà có kinh nghiệm, được đánh giá
                       cao và là những người cám kết mang lại quãng thời gian ở
                       tuyệt vời cho khách
                     </p>
                   </div>
                 </div>
-                <div className="flex gap-5 items-center mb-7">
+
+                <div className="flex gap-3 md:gap-5 items-center mb-6 md:mb-7">
                   {/* icon  */}
                   <div className="">
                     <svg
@@ -274,7 +369,7 @@ export default function Room() {
                       viewBox="0 0 24 24"
                       strokeWidth={1.5}
                       stroke="currentColor"
-                      className="size-6"
+                      className="w-6 h-6 md:w-7 md:h-7"
                     >
                       <path
                         strokeLinecap="round"
@@ -285,20 +380,27 @@ export default function Room() {
                   </div>
                   {/* content  */}
                   <div className="font-semibold">
-                    <h4 className="text-md">Miễn phí hủy trong 48h</h4>
+                    <h4 className="text-md md:text-base">
+                      Miễn phí hủy trong 48h
+                    </h4>
                   </div>
                 </div>
               </div>
+
               <hr />
-              <div className="my-2">
+
+              <div className="my-4 md:my-6">
                 <div className="">
-                  <h1 className="mb-2 font-semibold">Tiện nghi</h1>
-                  <div className="flex gap-10">
-                    <div className="col-span-1">
+                  <h1 className="mb-3 md:mb-4 font-semibold text-lg">
+                    Tiện nghi
+                  </h1>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                    <div>
                       {room.bep ? (
                         <div className="mb-2">
                           <i className="fa-solid fa-kitchen-set"></i>{" "}
-                          <span>Bếp</span>
+                          <span>Bếp</span>
                         </div>
                       ) : (
                         ""
@@ -310,7 +412,7 @@ export default function Room() {
                       ) : (
                         ""
                       )}
-                      {room.tivi ? (
+                      {room.dieuHoa ? (
                         <div className="mb-2">
                           <i className="fa-solid fa-wind"></i>{" "}
                           <span>Điều hòa</span>
@@ -321,7 +423,7 @@ export default function Room() {
                       {room.doXe ? (
                         <div className="mb-2">
                           <i className="fa-solid fa-car"></i>{" "}
-                          <span>Bãi đổ xe</span>
+                          <span>Bãi đỗ xe</span>
                         </div>
                       ) : (
                         ""
@@ -335,7 +437,8 @@ export default function Room() {
                         ""
                       )}
                     </div>
-                    <div className="col-span-1">
+
+                    <div>
                       {room.banUi ? (
                         <div className="mb-2">
                           <i className="fa-brands fa-pied-piper-hat"></i>{" "}
@@ -378,20 +481,188 @@ export default function Room() {
                     </div>
                   </div>
 
-                  <hr />
+                  <hr className="mt-4" />
                 </div>
               </div>
             </div>
-            <div className="col-span-4">
-              <div className=""></div>
+
+            {/* BOOK Room (giữ nguyên logic và handlers) */}
+            <div className="md:col-span-4">
+              <h1 className="text-center font-bold text-2xl md:text-2xl">
+                Đặt phòng
+              </h1>
+
+              <div className="w-full mt-4 shadow-lg rounded-2xl overflow-hidden">
+                <div className="p-5">
+                  <p>
+                    <b className="text-xl font-semibold">${room.giaTien}</b>/
+                    đêm
+                  </p>
+                  <div className="p-2">
+                    <div className="border rounded-2xl w-full h-auto">
+                      {/* date  */}
+                      <div className="grid grid-cols-2">
+                        <div className="col-span-1 p-2 flex justify-center items-center border-r">
+                          <div className="ml-3 w-full">
+                            <label
+                              className="font-serif text-sm"
+                              htmlFor="nhanPhong"
+                            >
+                              Nhận phòng
+                            </label>
+                            <input
+                              name="ngayDen"
+                              onChange={(e) => {
+                                setForm({
+                                  ...form,
+                                  ngayDen: `${e.target.value}T00:00:00`,
+                                });
+                              }}
+                              id="nhanPhong"
+                              className="border-0 p-0 focus:ring-0 focus:outline-none w-full text-sm"
+                              type="date"
+                            />
+                          </div>
+                        </div>
+                        <div className="col-span-1 p-2 flex justify-center items-center">
+                          <div className="ml-3 w-full">
+                            <label
+                              className="font-serif text-sm"
+                              htmlFor="traPhong"
+                            >
+                              Trả phòng
+                            </label>
+                            <input
+                              name="ngayDi"
+                              onChange={(e) =>
+                                setForm({
+                                  ...form,
+                                  ngayDi: `${e.target.value}T00:00:00`,
+                                })
+                              }
+                              id="traPhong"
+                              className="border-0 p-0 focus:ring-0 focus:outline-none w-full text-sm"
+                              type="date"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="border-t">
+                        <div className="mt-2 m-4">
+                          <label className="font-serif text-sm" htmlFor="">
+                            Khách
+                          </label>
+                          <div className="flex justify-between items-center w-full mt-2">
+                            <span>{form.soLuongKhach} khách</span>
+                            <div className="flex justify-around items-center gap-3">
+                              {/* minus  */}
+                              <button
+                                className="cursor-pointer"
+                                onClick={() =>
+                                  setForm({
+                                    ...form,
+                                    soLuongKhach:
+                                      form.soLuongKhach > 1
+                                        ? form.soLuongKhach - 1
+                                        : 1,
+                                  })
+                                }
+                              >
+                                <i className="fa-solid fa-minus text-red-600"></i>
+                              </button>
+                              <span>{form.soLuongKhach}</span>
+                              <button
+                                className="cursor-pointer"
+                                onClick={() =>
+                                  setForm({
+                                    ...form,
+                                    soLuongKhach: form.soLuongKhach + 1,
+                                  })
+                                }
+                              >
+                                <i className="fa-solid fa-plus text-green-600"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="w-[90%] mx-auto mb-3">
+                  <button
+                    onClick={handleSubmit}
+                    type="button"
+                    className="w-full text-white rounded-md bg-linear-to-r from-purple-500 to-pink-500 hover:opacity-95 focus:ring-4 focus:outline-none focus:ring-purple-200 font-medium text-sm px-4 py-2.5"
+                  >
+                    Đặt phòng
+                  </button>
+                </div>
+
+                <div className="px-5 pb-5">
+                  <div className="flex justify-between items-center text-sm">
+                    <p>
+                      <u>
+                        {`$${room.giaTien}`} x {money.day} đêm
+                      </u>
+                    </p>
+                    <p className="text-gray-700">${room.giaTien * money.day}</p>
+                  </div>
+                  <div className="flex justify-between items-center text-sm mt-2">
+                    <p className="text-gray-700">
+                      <u>Phí dịch vụ</u>
+                    </p>
+                    <p className="text-gray-700">
+                      ${money.moneyService * money.day}
+                    </p>
+                  </div>
+
+                  <hr className="my-3" />
+                  <div className="flex justify-between items-center font-semibold">
+                    <p>Tổng</p>
+                    <p>
+                      $
+                      {room.giaTien * money.day +
+                        money.moneyService * money.day}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <hr className="bg-gray-100 mt-6" />
             </div>
-            <hr className="bg-gray-100" />
           </div>
         )}
       </div>
+      {/* modal  */}
+      {showPopupSucess && (
+        <div
+          id="success-modal"
+          className="fixed inset-0 flex items-center  justify-center z-50  "
+        >
+          <div className="bg-gray-200 opacity-90 p-6 rounded-lg text-center w-80">
+            <h3 className="text-lg font-semibold text-green-400 mb-4">
+              Đặt phòng thành công!
+            </h3>
+            <button
+              onClick={() => {
+                setShowPopupSucess(false);
+                // distpatch({ type: "bookRoomReducer/reset" });
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10 ">
         {renderComment()}
       </div>
+
       <button
         type="button"
         className="flex   items-center mb-5 rounded-md cursor-pointer hover:bg-gray-100 text-body bg-neutral-primary border border-default hover:bg-neutral-secondary-soft hover:text-heading focus:ring-4 focus:ring-neutral-tertiary font-medium leading-5 rounded-base text-sm px-4 py-3.5 focus:outline-none"
@@ -416,8 +687,8 @@ export default function Room() {
       {/* input comment  */}
       <div className="flex gap-6 items-center">
         <div className="">
-          {userJson?.hinhAnh ? (
-            <img src={userJson?.hinhAnh} alt="" />
+          {user?.hinhAnh ? (
+            <img src={user?.hinhAnh} alt="" />
           ) : (
             <img
               className="w-15 h-15 rounded-full hover:bg-amber-50"
@@ -433,7 +704,7 @@ export default function Room() {
             }
             value={data.noiDung}
             name=""
-            className="w-[600px] h-[150px] rounded-2xl"
+            className="w-full sm:w-[400px] lg:w-[600px] h-[150px] rounded-2xl p-3 border"
           ></textarea>
           <StarRating
             onChangeRating={(value: number) =>
@@ -442,6 +713,19 @@ export default function Room() {
           />
           <button
             onClick={() => {
+              if (!userData) {
+                alert("Bạn cần đăng nhập để tiếp tục!");
+                const modalEl = document.getElementById("authentication-modal");
+                if (modalEl) {
+                  const modal = new Modal(modalEl, {
+                    placement: "center",
+                    backdrop: "dynamic",
+                    closable: true,
+                  });
+                  modal.show();
+                }
+                return;
+              }
               distpatch(postComment(data));
             }}
             type="button"

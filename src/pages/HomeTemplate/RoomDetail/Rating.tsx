@@ -1,17 +1,21 @@
 import { useState } from "react";
+
 interface StarRatingProps {
   onChangeRating: (value: number) => void;
 }
+
 export default function StarRating({ onChangeRating }: StarRatingProps) {
-  const [rating, setRating] = useState(0); // số sao đã chọn
-  const [hover, setHover] = useState(0); // số sao khi hover
+  const [rating, setRating] = useState(0);
+  const [hover, setHover] = useState(0);
+
   const handleClick = (value: number) => {
     setRating(value);
     onChangeRating(value);
   };
+
   return (
-    <div className="flex flex-col items-center gap-3">
-      <div className="flex gap-1">
+    <div className="flex flex-col items-center gap-2 md:gap-3">
+      <div className="flex gap-1 md:gap-2 flex-wrap justify-center">
         {[1, 2, 3, 4, 5].map((star) => (
           <svg
             key={star}
@@ -22,7 +26,7 @@ export default function StarRating({ onChangeRating }: StarRatingProps) {
             viewBox="0 0 24 24"
             fill={(hover || rating) >= star ? "gold" : "none"}
             stroke="gold"
-            className="w-8 h-8 cursor-pointer transition-all"
+            className="w-6 h-6 md:w-8 md:h-8 cursor-pointer transition-all"
           >
             <path
               strokeLinecap="round"
@@ -34,7 +38,7 @@ export default function StarRating({ onChangeRating }: StarRatingProps) {
         ))}
       </div>
 
-      <p className="text-sm text-gray-600">
+      <p className="text-xs md:text-sm text-gray-600">
         Bạn đánh giá: <strong>{rating} sao</strong>
       </p>
     </div>

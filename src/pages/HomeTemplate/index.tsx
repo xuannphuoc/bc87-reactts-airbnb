@@ -1,16 +1,22 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/footer";
+
 export default function HomeTemplate() {
   return (
-    <div className="grid grid-cols-12">
-      <div className="col-span-12  z-50">
+    <div className="min-h-screen flex flex-col">
+      <div className="w-full z-50">
         <Navbar />
       </div>
-      <div className="col-span-12 min-h-screen mt-30  ">
+
+      {/* khoảng trống bằng chiều cao của navbar */}
+      <div className="h-20 md:h-[130px] lg:h-[110px]"></div>
+
+      <div className="flex-1 w-full">
         <Outlet />
       </div>
-      <div className="col-span-12">
+
+      <div className="w-full">
         <Footer />
       </div>
     </div>

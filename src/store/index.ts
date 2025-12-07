@@ -1,12 +1,18 @@
 import { configureStore } from "@reduxjs/toolkit";
 import LocationSlice from "./../pages/HomeTemplate/components/Navbar/slice";
-import getDataPageSlice from "./../pages/HomeTemplate/HomePage/discover";
+import getDataPageSlice from "./../pages/HomeTemplate/HomePage/components/Discover/discoverSlice";
 import SignUpReducer from "../pages/HomeTemplate/components/Signup/slice";
 import LoginReducer from "../pages/HomeTemplate/components/Signin/slice";
 import RoomSlice from "./../pages/HomeTemplate/components/Navbar/getRoom";
-import getDataRoomSlice from "./../pages/HomeTemplate/DetailRoomPage/getDetailRoom";
-import commentSlice from "./../pages/HomeTemplate/DetailRoomPage/getComment";
+import getDataRoomSlice from "./../pages/HomeTemplate/ListLocal/getDetailRoom";
+import commentSlice from "./../pages/HomeTemplate/ListLocal/getComment";
 import postCommentReducer from "./../pages/HomeTemplate/RoomDetail/postComment";
+import getLocalIdSlice from "./../pages/HomeTemplate/ListLocal/getLocalId";
+import bookRoomSlice from "./../pages/HomeTemplate/RoomDetail/bookRoom";
+import getRoomByUserSlice from "./../pages/User/getRoomByUser";
+import putUserSlice from "./../pages/User/getRoomByUser";
+import getUserSlice from "./../pages/User/getRoomByUser";
+import userRoomsSlice from "./../pages/User/roomBooked";
 export const store = configureStore({
   reducer: {
     LocationSlice,
@@ -17,6 +23,12 @@ export const store = configureStore({
     getDataRoomSlice,
     commentSlice,
     postCommentReducer,
+    getLocalIdSlice,
+    bookRoomSlice,
+    getRoomByUserSlice,
+    putUserSlice,
+    getUserSlice,
+    userRoomsSlice,
   },
 });
 

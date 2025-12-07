@@ -7,6 +7,9 @@ import {
 import { initFlowbite } from "flowbite";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../store";
+
 export default function User() {
   const [login, setLogin] = useState(false);
   const [user, setUser] = useState<User | null>({
@@ -16,15 +19,25 @@ export default function User() {
   const navigative = useNavigate();
 
   useEffect(() => {
+    const storedUser =
+      localStorage.getItem("userLogin") || sessionStorage.getItem("userLogin");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+      setLogin(true);
+    }
+  }, []);
+
+  useEffect(() => {
     setTimeout(() => {
       initFlowbite();
     }, 100);
   }, []);
-  console.log(user?.user);
-  console.log(login);
 
+  const userData = useSelector((state: RootState) => state.getUserSlice.data);
+  console.log(userData);
   const logout = () => {
     localStorage.removeItem("userLogin");
+    sessionStorage.removeItem("userLogin");
     setLogin(false);
     setUser(null);
     setTimeout(() => {
@@ -32,6 +45,7 @@ export default function User() {
     }, 100);
     navigative("/");
   };
+
   const renderIcon = () => {
     return (
       <div

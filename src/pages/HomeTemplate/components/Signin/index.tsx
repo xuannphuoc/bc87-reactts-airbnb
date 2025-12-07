@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Login } from "./slice";
 import { type StateInitial } from "./slice";
 import { type User } from "../Navbar";
+import { initFlowbite } from "flowbite";
 interface SigninProps {
   onLoginSuccess: (user: User) => void;
 }
@@ -16,9 +17,13 @@ export default function Signin({ onLoginSuccess }: SigninProps) {
     email: "",
     password: "",
   });
-
+  const renderFlowbite = () => {
+    setTimeout(() => {
+      initFlowbite();
+    }, 1);
+  };
   const state = useSelector<RootState>((state) => state.LoginReducer);
-  const { data, loading, error } = state as StateInitial;
+  const { data } = state as StateInitial;
   const [remember, setRemember] = useState(false);
   useEffect(() => {
     if (data) {
@@ -65,6 +70,7 @@ export default function Signin({ onLoginSuccess }: SigninProps) {
           <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t ">
             <h3 className="text-xl font-semibold  ">Đăng nhập tài khoản</h3>
             <button
+              onClick={renderFlowbite}
               type="button"
               className="end-2.5 text-gray-400 bg-transparent   rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center  "
               data-modal-hide="authentication-modal"

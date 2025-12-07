@@ -1,4 +1,4 @@
-import { type Paganation } from "../discover";
+import { type Paganation } from "./../Discover/discoverSlice";
 type Props = {
   place: Paganation;
 };

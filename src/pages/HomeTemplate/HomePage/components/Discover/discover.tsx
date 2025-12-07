@@ -1,8 +1,8 @@
-import { getDataPaga } from "./discover";
+import { getDataPaga } from "./discoverSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { type Paganation } from "./discover";
-import Place from "./components/place";
-import { type AppDispatch, type RootState } from "./../../../store/index";
+import { type Paganation } from "./discoverSlice";
+import Place from "./../../components/Local/place";
+import { type AppDispatch, type RootState } from "./../../../../../store/index";
 import { useEffect } from "react";
 export default function Discover() {
   const dispatch: AppDispatch = useDispatch();

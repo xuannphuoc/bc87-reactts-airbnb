@@ -1,168 +1,127 @@
-import Discover from "./discover.tsx";
+import Discover from "./components/Discover/discover";
 
 export default function HomePage() {
   return (
-    <div className=" ">
-      <div className="">
-        <div className="bg-black/5   lg:px-29  px-4 py-3  md:px-15  md:py-5 lg:py-10  ">
-          <div
-            id="default-carousel"
-            className="relative w-full"
-            data-carousel="slide"
+    <div className="w-full">
+      <div className="bg-black/5 px-4 py-4 sm:px-6 md:px-10 lg:px-16 lg:py-10">
+        <div
+          id="default-carousel"
+          className="relative w-full"
+          data-carousel="slide"
+        >
+          {/* Carousel wrapper */}
+          <div className="relative h-56 sm:h-72 md:h-96 lg:h-[600px] xl:h-[750px] overflow-hidden rounded-xl">
+            {/* Item 1 */}
+            <div className="hidden duration-700 ease-in-out" data-carousel-item>
+              <img
+                src="/images/c5.jpg"
+                className="absolute w-full h-full object-cover"
+                alt="..."
+              />
+            </div>
+
+            {/* Item 2 */}
+            <div className="hidden duration-700 ease-in-out" data-carousel-item>
+              <img
+                src="/images/c1.jpeg"
+                className="absolute w-full h-full object-cover"
+                alt="..."
+              />
+            </div>
+
+            {/* Item 3 */}
+            <div className="hidden duration-700 ease-in-out" data-carousel-item>
+              <img
+                src="/images/c6.jpg"
+                className="absolute w-full h-full object-cover"
+                alt="..."
+              />
+            </div>
+
+            {/* Item 4 */}
+            <div className="hidden duration-700 ease-in-out" data-carousel-item>
+              <img
+                src="/images/c3.jpg"
+                className="absolute w-full h-full object-cover"
+                alt="..."
+              />
+            </div>
+
+            {/* Item 5 */}
+            <div className="hidden duration-700 ease-in-out" data-carousel-item>
+              <img
+                src="/images/c4.jpg"
+                className="absolute w-full h-full object-cover"
+                alt="..."
+              />
+            </div>
+          </div>
+
+          {/* Indicators */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex space-x-3">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <button
+                key={i}
+                type="button"
+                className="w-3 h-3 rounded-full bg-white/60 hover:bg-white"
+                data-carousel-slide-to={i}
+              />
+            ))}
+          </div>
+
+          {/* Prev btn */}
+          <button
+            type="button"
+            className="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-3 sm:px-4 cursor-pointer group"
+            data-carousel-prev
           >
-            {/* Carousel wrapper */}
-            <div className="relative h-56 overflow-hidden rounded-lg md:h-[400px] lg:h-[700px]">
-              {/* Item 1 */}
-              <div
-                className="hidden duration-700 ease-in-out"
-                data-carousel-item
+            <span className="inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/30 group-hover:bg-white/50">
+              <svg
+                className="w-4 h-4 text-white"
+                fill="none"
+                viewBox="0 0 6 10"
               >
-                <img
-                  src="/images/c5.jpg"
-                  className="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
-                  alt="..."
+                <path
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 1 1 5l4 4"
                 />
-              </div>
-              {/* Item 2 */}
-              <div
-                className="hidden duration-700 ease-in-out"
-                data-carousel-item
+              </svg>
+            </span>
+          </button>
+
+          {/* Next btn */}
+          <button
+            type="button"
+            className="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-3 sm:px-4 cursor-pointer group"
+            data-carousel-next
+          >
+            <span className="inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/30 group-hover:bg-white/50">
+              <svg
+                className="w-4 h-4 text-white"
+                fill="none"
+                viewBox="0 0 6 10"
               >
-                <img
-                  src="/images/c1.jpeg"
-                  className="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
-                  alt="..."
+                <path
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m1 9 4-4-4-4"
                 />
-              </div>
-              {/* Item 3 */}
-              <div
-                className="hidden duration-700 ease-in-out"
-                data-carousel-item
-              >
-                <img
-                  src="/images/c6.jpg"
-                  className="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
-                  alt="..."
-                />
-              </div>
-              {/* Item 4 */}
-              <div
-                className="hidden duration-700 ease-in-out"
-                data-carousel-item
-              >
-                <img
-                  src="/images/c3.jpg"
-                  className="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
-                  alt="..."
-                />
-              </div>
-              {/* Item 5 */}
-              <div
-                className="hidden duration-700 ease-in-out"
-                data-carousel-item
-              >
-                <img
-                  src="/images/c4.jpg"
-                  className="absolute block w-full -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
-                  alt="..."
-                />
-              </div>
-            </div>
-            {/* Slider indicators */}
-            <div className="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3 rtl:space-x-reverse">
-              <button
-                type="button"
-                className="w-3 h-3 rounded-full"
-                aria-current="true"
-                aria-label="Slide 1"
-                data-carousel-slide-to={0}
-              />
-              <button
-                type="button"
-                className="w-3 h-3 rounded-full"
-                aria-current="false"
-                aria-label="Slide 2"
-                data-carousel-slide-to={1}
-              />
-              <button
-                type="button"
-                className="w-3 h-3 rounded-full"
-                aria-current="false"
-                aria-label="Slide 3"
-                data-carousel-slide-to={2}
-              />
-              <button
-                type="button"
-                className="w-3 h-3 rounded-full"
-                aria-current="false"
-                aria-label="Slide 4"
-                data-carousel-slide-to={3}
-              />
-              <button
-                type="button"
-                className="w-3 h-3 rounded-full"
-                aria-current="false"
-                aria-label="Slide 5"
-                data-carousel-slide-to={4}
-              />
-            </div>
-            {/* Slider controls */}
-            <button
-              type="button"
-              className="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
-              data-carousel-prev
-            >
-              <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-                <svg
-                  className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 6 10"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 1 1 5l4 4"
-                  />
-                </svg>
-                <span className="sr-only">Previous</span>
-              </span>
-            </button>
-            <button
-              type="button"
-              className="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
-              data-carousel-next
-            >
-              <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none">
-                <svg
-                  className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 6 10"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="m1 9 4-4-4-4"
-                  />
-                </svg>
-                <span className="sr-only">Next</span>
-              </span>
-            </button>
-          </div>
-          <div>
-            <h1 className="font-semibold text-sm sm:text-xl md:text-2xl text-center mt-5 text-gray-700 animate__animated animate__fadeInDown animate__delay-1s">
-              Nhờ có Host, mọi điều đều có thể
-            </h1>
-          </div>
+              </svg>
+            </span>
+          </button>
         </div>
+
+        {/* Title */}
+        <h1 className="font-semibold text-lg sm:text-xl md:text-2xl text-center mt-6 text-gray-700 animate__animated animate__fadeInDown">
+          Nhờ có Host, mọi điều đều có thể
+        </h1>
       </div>
+
       <div className="container mx-auto py-10">
         <Discover />
       </div>
