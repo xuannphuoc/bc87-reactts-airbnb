@@ -1,9 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../pages/AdminTemplate/AuthPage/slice";
-import roomReducer from "../pages/AdminTemplate/DashboardPage/ManageRoom/silce"
+import userReducer from "./../pages/AdminTemplate/DashboardPage/ManageUser/slice";
+import roomReducer from "./../pages/AdminTemplate/DashboardPage/ManageRoom/silce"
 
 export const store = configureStore({
-  reducer: { authReducer, roomReducer },
+  reducer: { authReducer, userReducer, roomReducer },
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
