@@ -17,6 +17,31 @@ export default function Signin({ onLoginSuccess }: SigninProps) {
     email: "",
     password: "",
   });
+  const validateForm = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!acount.email) {
+      alert("Vui lòng nhập email!");
+      return false;
+    }
+
+    if (!emailRegex.test(acount.email)) {
+      alert("Email không hợp lệ!");
+      return false;
+    }
+
+    if (!acount.password) {
+      alert("Vui lòng nhập mật khẩu!");
+      return false;
+    }
+
+    if (acount.password.length < 6) {
+      alert("Mật khẩu phải có ít nhất 6 ký tự!");
+      return false;
+    }
+
+    return true;
+  };
   const renderFlowbite = () => {
     setTimeout(() => {
       initFlowbite();
@@ -53,6 +78,9 @@ export default function Signin({ onLoginSuccess }: SigninProps) {
   };
   const onSubmit = (e: React.FormEvent<HTMLFormElement>, acount: Account) => {
     e.preventDefault();
+
+    if (!validateForm()) return;
+
     distpatch(Login(acount));
   };
 

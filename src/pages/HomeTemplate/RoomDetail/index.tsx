@@ -10,6 +10,8 @@ import { useParams } from "react-router-dom";
 import { bookRoomReducer } from "./bookRoom";
 import { type FormBookRom } from "./bookRoom";
 import { initFlowbite, Modal } from "flowbite";
+import { useContext } from "react";
+import { BookingContext } from "../../../context/BookingContext.tsx";
 type Props = {
   cmt: Comments;
 };
@@ -93,23 +95,39 @@ const CommentComponent = ({ cmt }: Props) => {
 };
 
 export default function Room() {
+  const istoday = new Date().toISOString().split("T")[0];
+  const context = useContext(BookingContext);
+  if (!context) return null;
+
+  const { booking } = context;
+
   const roomData = useSelector((state: RootState) => state.getDataRoomSlice);
   const comment = useSelector((state: RootState) => state.commentSlice.data);
   const [showPopupSucess, setShowPopupSucess] = useState(false);
-
+  const [visibleCount, setVisibleCount] = useState(3);
   const bookRoomState = useSelector((state: RootState) => state.bookRoomSlice);
 
   useEffect(() => {
     if (bookRoomState.data) {
-      setShowPopupSucess(true);
+      alert("Đặt phòng thành công!");
+      distpatch({ type: "bookRoomSlice/reset" });
     }
   }, [bookRoomState.data]);
   // comment
   const postCommentState = useSelector(
     (state: RootState) => state.postCommentReducer
   );
-  const notify = postCommentState;
-  console.log(notify);
+  useEffect(() => {
+    if (postCommentState?.data) {
+      alert("Thêm bình luận thành công!");
+    }
+    setData((prev) => ({
+      ...prev,
+      noiDung: "",
+      saoBinhLuan: 0,
+    }));
+  }, [postCommentState?.data]);
+
   // get maPhong
   const { id: maPhong } = useParams();
   //  get user
@@ -150,27 +168,30 @@ export default function Room() {
     }
   }, []);
   const renderComment = () => {
-    return comment?.map((cmt: Comments) => {
-      return <CommentComponent key={cmt.id} cmt={cmt} />;
-    });
+    return comment
+      ?.slice(0, visibleCount)
+      .map((cmt: Comments) => <CommentComponent key={cmt.id} cmt={cmt} />);
   };
   const [form, setForm] = useState<FormBookRom>({
     maPhong: Number(maPhong),
-    ngayDen: "",
-    ngayDi: "",
-    soLuongKhach: 1,
+    ngayDen: booking.checkin.split("T")[0],
+    ngayDi: booking.checkout.split("T")[0],
+    soLuongKhach: booking.guests,
     maNguoiDung: userData?.id ?? 0,
   });
   // comment
-  const isdate = new Date();
+  const today = new Date();
+  const formattedDate = `${today.getFullYear()}-${String(
+    today.getMonth() + 1
+  ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}T00:00:00`;
   const [data, setData] = useState<PostComment>({
     maPhong: Number(maPhong),
     maNguoiBinhLuan: userData?.id ?? 0,
-    ngayBinhLuan: `${isdate.getDate()}/${isdate.getMonth()}/${isdate.getFullYear()}T00:00:00`,
+    ngayBinhLuan: formattedDate,
     noiDung: "",
     saoBinhLuan: 0,
   });
-  console.log(data);
+
   // post form
   useEffect(() => {
     initFlowbite();
@@ -513,11 +534,21 @@ export default function Room() {
                             <input
                               name="ngayDen"
                               onChange={(e) => {
+                                const value = e.target.value;
+
+                                if (value < istoday) {
+                                  alert(
+                                    "Ngày nhận phòng không được nhỏ hơn ngày hiện tại!"
+                                  );
+                                  return;
+                                }
+
                                 setForm({
                                   ...form,
-                                  ngayDen: `${e.target.value}T00:00:00`,
+                                  ngayDen: `${value}T00:00:00`,
                                 });
                               }}
+                              value={booking.checkin}
                               id="nhanPhong"
                               className="border-0 p-0 focus:ring-0 focus:outline-none w-full text-sm"
                               type="date"
@@ -534,12 +565,23 @@ export default function Room() {
                             </label>
                             <input
                               name="ngayDi"
-                              onChange={(e) =>
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                const checkin = form.ngayDen?.split("T")[0];
+
+                                if (checkin && value < checkin) {
+                                  alert(
+                                    "Ngày trả phòng không được nhỏ hơn ngày nhận phòng!"
+                                  );
+                                  return;
+                                }
+
                                 setForm({
                                   ...form,
-                                  ngayDi: `${e.target.value}T00:00:00`,
-                                })
-                              }
+                                  ngayDi: `${value}T00:00:00`,
+                                });
+                              }}
+                              value={booking.checkout}
                               id="traPhong"
                               className="border-0 p-0 focus:ring-0 focus:outline-none w-full text-sm"
                               type="date"
@@ -554,32 +596,50 @@ export default function Room() {
                             Khách
                           </label>
                           <div className="flex justify-between items-center w-full mt-2">
-                            <span>{form.soLuongKhach} khách</span>
+                            <span>
+                              <span>{form.soLuongKhach} khách</span>
+                              khách
+                            </span>
+
                             <div className="flex justify-around items-center gap-3">
                               {/* minus  */}
                               <button
                                 className="cursor-pointer"
-                                onClick={() =>
+                                onClick={() => {
+                                  const newGuests =
+                                    form.soLuongKhach > 1
+                                      ? form.soLuongKhach - 1
+                                      : 1;
+
                                   setForm({
                                     ...form,
-                                    soLuongKhach:
-                                      form.soLuongKhach > 1
-                                        ? form.soLuongKhach - 1
-                                        : 1,
-                                  })
-                                }
+                                    soLuongKhach: newGuests,
+                                  });
+
+                                  setBooking((prev: any) => ({
+                                    ...prev,
+                                    guests: newGuests,
+                                  }));
+                                }}
                               >
                                 <i className="fa-solid fa-minus text-red-600"></i>
                               </button>
                               <span>{form.soLuongKhach}</span>
                               <button
                                 className="cursor-pointer"
-                                onClick={() =>
+                                onClick={() => {
+                                  const newGuests = form.soLuongKhach + 1;
+
                                   setForm({
                                     ...form,
-                                    soLuongKhach: form.soLuongKhach + 1,
-                                  })
-                                }
+                                    soLuongKhach: newGuests,
+                                  });
+
+                                  setBooking((prev: any) => ({
+                                    ...prev,
+                                    guests: newGuests,
+                                  }));
+                                }}
                               >
                                 <i className="fa-solid fa-plus text-green-600"></i>
                               </button>
@@ -649,7 +709,7 @@ export default function Room() {
             <button
               onClick={() => {
                 setShowPopupSucess(false);
-                // distpatch({ type: "bookRoomReducer/reset" });
+                distpatch({ type: "bookRoomReducer/reset" });
               }}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer"
             >
@@ -665,16 +725,24 @@ export default function Room() {
 
       <button
         type="button"
-        className="flex   items-center mb-5 rounded-md cursor-pointer hover:bg-gray-100 text-body bg-neutral-primary border border-default hover:bg-neutral-secondary-soft hover:text-heading focus:ring-4 focus:ring-neutral-tertiary font-medium leading-5 rounded-base text-sm px-4 py-3.5 focus:outline-none"
+        onClick={() =>
+          visibleCount < comment.length
+            ? setVisibleCount(comment.length)
+            : setVisibleCount(3)
+        }
+        className="flex items-center mb-5 rounded-md cursor-pointer hover:bg-gray-100 text-body bg-neutral-primary border border-default hover:bg-neutral-secondary-soft hover:text-heading focus:ring-4 focus:ring-neutral-tertiary font-medium leading-5 rounded-base text-sm px-4 py-3.5 focus:outline-none"
       >
-        Hiển thị tất cả các bình luận
+        {visibleCount < comment.length
+          ? "Hiển thị tất cả các bình luận"
+          : "Thu gọn "}
+
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="size-6 animate__fadeOutDown animate__animated  animate__infinite	infinite animate__slow	2s"
+          className="size-6 animate__fadeOutDown animate__animated animate__infinite animate__slow 2s"
         >
           <path
             strokeLinecap="round"
@@ -683,6 +751,7 @@ export default function Room() {
           />
         </svg>
       </button>
+
       <p className="text-2xl mb-2 font-medium"> Bình luận của bạn</p>
       {/* input comment  */}
       <div className="flex gap-6 items-center">
