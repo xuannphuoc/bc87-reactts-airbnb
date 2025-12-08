@@ -6,7 +6,7 @@ export interface User {
   id: number;
   name: string;
   email: string;
-  phone: string;
+  phone?: string | null;
   birthday: string;
   avatar?: string;
   gender: boolean;
@@ -17,7 +17,7 @@ export interface CreateUserPayload {
   email: string;
   password: string;
   name: string;
-  phone: string;
+  phone?: string | null;
   birthday: string;
   gender: boolean;
   role: string;
@@ -28,7 +28,7 @@ export interface UpdateUserPayload {
   id: number;
   email?: string;
   name?: string;
-  phone?: string;
+  phone?: string | null;
   birthday?: string;
   gender?: boolean;
   role?: string;
@@ -61,9 +61,9 @@ const initialState: UserState = {
   },
 };
 
-
 export const getAllUsers = createAsyncThunk(
   "user/getAllUsers",
+
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get("/users");
@@ -75,7 +75,6 @@ export const getAllUsers = createAsyncThunk(
     }
   }
 );
-
 
 export const getUsersPagination = createAsyncThunk(
   "user/getUsersPagination",
@@ -96,7 +95,6 @@ export const getUsersPagination = createAsyncThunk(
   }
 );
 
-
 export const getUserById = createAsyncThunk(
   "user/getUserById",
   async (userId: number, { rejectWithValue }) => {
@@ -111,7 +109,6 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-
 export const searchUserByName = createAsyncThunk(
   "user/searchUserByName",
   async (userName: string, { rejectWithValue }) => {
@@ -119,13 +116,10 @@ export const searchUserByName = createAsyncThunk(
       const response = await api.get(`/users/search/${userName}`);
       return response.data.content;
     } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "User not found"
-      );
+      return rejectWithValue(error.response?.data?.message || "User not found");
     }
   }
 );
-
 
 export const createUser = createAsyncThunk(
   "user/createUser",
@@ -140,7 +134,6 @@ export const createUser = createAsyncThunk(
     }
   }
 );
-
 
 export const updateUser = createAsyncThunk(
   "user/updateUser",
@@ -157,7 +150,6 @@ export const updateUser = createAsyncThunk(
   }
 );
 
-
 export const deleteUser = createAsyncThunk(
   "user/deleteUser",
   async (userId: number, { rejectWithValue }) => {
@@ -171,7 +163,6 @@ export const deleteUser = createAsyncThunk(
     }
   }
 );
-
 
 export const uploadAvatar = createAsyncThunk(
   "user/uploadAvatar",
@@ -190,7 +181,6 @@ export const uploadAvatar = createAsyncThunk(
     }
   }
 );
-
 
 const userReducer = createSlice({
   name: "user",
