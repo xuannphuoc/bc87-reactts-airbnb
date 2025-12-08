@@ -30,7 +30,6 @@ interface FormData {
   role: string;
 }
 
-// ✅ Debounce Hook
 function useDebounce(value: string, delay: number) {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
@@ -47,7 +46,6 @@ function useDebounce(value: string, delay: number) {
   return debouncedValue;
 }
 
-// ✅ Modal Component với memo
 const Modal = memo(({ title, children, onClose }: any) => (
   <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-50">
     <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -68,7 +66,6 @@ const Modal = memo(({ title, children, onClose }: any) => (
   </div>
 ));
 
-// ✅ UserRow Component với memo
 const UserRow = memo(({ user, onView, onEdit, onDelete }: any) => (
   <tr className="bg-white border-b hover:bg-gray-50">
     <td className="px-6 py-4 font-medium text-gray-900">{user.id}</td>
@@ -593,7 +590,6 @@ export default function ManageUser() {
           >
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Email */}
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900">
                     Email <span className="text-red-600">*</span>
@@ -621,7 +617,6 @@ export default function ManageUser() {
                   )}
                 </div>
 
-                {/* Password */}
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900">
                     Mật khẩu <span className="text-red-600">*</span>
@@ -649,7 +644,6 @@ export default function ManageUser() {
                   )}
                 </div>
 
-                {/* Name */}
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900">
                     Họ và tên <span className="text-red-600">*</span>
@@ -677,7 +671,6 @@ export default function ManageUser() {
                   )}
                 </div>
 
-                {/* Phone */}
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900">
                     Số điện thoại <span className="text-red-600">*</span>
@@ -705,7 +698,6 @@ export default function ManageUser() {
                   )}
                 </div>
 
-                {/* Birthday */}
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900">
                     Ngày sinh
@@ -722,7 +714,7 @@ export default function ManageUser() {
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5"
                   />
                 </div>
-                {/* Gender */}
+
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900">
                     Giới tính <span className="text-red-600">*</span>
@@ -752,7 +744,6 @@ export default function ManageUser() {
                   )}
                 </div>
 
-                {/* Role */}
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900">
                     Vai trò
@@ -795,7 +786,6 @@ export default function ManageUser() {
           >
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Email */}
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900">
                     Email <span className="text-red-600">*</span>
@@ -823,7 +813,6 @@ export default function ManageUser() {
                   )}
                 </div>
 
-                {/* Name */}
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900">
                     Họ và tên <span className="text-red-600">*</span>
@@ -851,7 +840,6 @@ export default function ManageUser() {
                   )}
                 </div>
 
-                {/* Phone */}
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900">
                     Số điện thoại <span className="text-red-600">*</span>
@@ -879,7 +867,6 @@ export default function ManageUser() {
                   )}
                 </div>
 
-                {/* Birthday */}
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900">
                     Ngày sinh
@@ -897,7 +884,6 @@ export default function ManageUser() {
                   />
                 </div>
 
-                {/* Gender */}
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900">
                     Giới tính <span className="text-red-600">*</span>
@@ -927,7 +913,6 @@ export default function ManageUser() {
                   )}
                 </div>
 
-                {/* Role */}
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-900">
                     Vai trò
