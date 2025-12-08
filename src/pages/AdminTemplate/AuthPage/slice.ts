@@ -24,7 +24,7 @@ export const authenLogin = createAsyncThunk(
     try {
       const response = await api.post(`auth/signin`, user);
       const authInfo = response.data.content.user;
-      // Check permission user
+
       if (authInfo.role === "USER" || authInfo.role === "user") {
         return rejectWithValue({
           response: {
@@ -33,10 +33,20 @@ export const authenLogin = createAsyncThunk(
         });
       }
 
-      // local storage
       localStorage.setItem("ADMIN_INFO", JSON.stringify(authInfo));
-
       return authInfo;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const logoutUser = createAsyncThunk(
+  "auth/logout",
+  async (_, { rejectWithValue }) => {
+    try {
+      localStorage.removeItem("ADMIN_INFO");
+      return null;
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -46,7 +56,12 @@ export const authenLogin = createAsyncThunk(
 const authReducer = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  reducers: {
+    clearAuth: (state) => {
+      state.data = null;
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(authenLogin.pending, (state) => {
       state.loading = true;
@@ -61,7 +76,23 @@ const authReducer = createSlice({
       state.loading = false;
       state.error = action.payload as AxiosError<{ content: string }>;
     });
+
+    builder.addCase(logoutUser.pending, (state) => {
+      state.loading = true;
+    });
+
+    builder.addCase(logoutUser.fulfilled, (state) => {
+      state.loading = false;
+      state.data = null;
+      state.error = null;
+    });
+
+    builder.addCase(logoutUser.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload as AxiosError<{ content: string }>;
+    });
   },
 });
 
+export const { clearAuth } = authReducer.actions;
 export default authReducer.reducer;
