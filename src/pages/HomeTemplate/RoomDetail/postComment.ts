@@ -32,7 +32,7 @@ if (localData) {
 }
 
 export const postComment = createAsyncThunk<any, PostComment>(
-  "bookRoomReducer",
+  "postCommentReducer",
   async (data, { rejectWithValue }) => {
     try {
       const response = await axios({

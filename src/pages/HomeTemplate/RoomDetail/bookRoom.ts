@@ -61,6 +61,7 @@ const bookRoomSlice = createSlice({
   reducers: {
     reset: (state) => {
       state.data = null;
+      state.error = null;
     },
   },
   extraReducers: (builder) => {

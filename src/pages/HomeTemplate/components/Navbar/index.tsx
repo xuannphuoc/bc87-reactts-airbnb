@@ -11,6 +11,9 @@ import { getDataRoom } from "./getRoom";
 import { useNavigate } from "react-router-dom";
 import { getRoomByUserReducer } from "./../../../User/getRoomByUser";
 import { getUserReducer } from "./../../../User/getUser";
+import { useContext } from "react";
+import { BookingContext } from "./../../../../context/BookingContext";
+
 export interface UserData {
   id: number;
   name: string;
@@ -28,6 +31,10 @@ export interface User {
 }
 
 export default function Navbar() {
+  const context = useContext(BookingContext);
+
+  if (!context) return null;
+  const { booking, setBooking } = context;
   const [login, setLogin] = useState(false);
   const [user, setUser] = useState<User | null>({
     user: {} as UserData,
@@ -72,6 +79,7 @@ export default function Navbar() {
     localStorage.setItem("userLogin", JSON.stringify(userData));
     setTimeout(() => initFlowbite(), 100);
   };
+
   // give inputLocaton
   const handleSelectLocation = (locationName: string) => {
     setInputLocation(locationName);
@@ -237,12 +245,12 @@ export default function Navbar() {
             <div className="hidden md:flex col-span-8 lg:col-span-6 justify-center">
               <ul className="flex space-x-6 font-medium text-gray-700">
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/"
                     className="flex items-center gap-1 hover:text-black"
                   >
-                    <span className="text-2xl">🏡</span> Nơi lưu trú
-                  </a>
+                    <span className="text-2xl">🏡</span> Nơi ở
+                  </Link>
                 </li>
                 <li>
                   <a
@@ -265,11 +273,11 @@ export default function Navbar() {
 
             {/* Right - Actions */}
             <div className="col-span-2 lg:col-span-3 flex items-center justify-end space-x-3">
-              {/* Globe icon */}
+              {/* Globe icon */}{" "}
+              <span className=" hidden lg:block"> Đón tiếp khách </span>
               <button className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shadow-md hover:shadow-lg transition">
-                <i className="fa-solid fa-globe text-gray-800"></i>
+                <i className="fa-solid fa-globe text-gray-800 animate__headShake animate__animated animate__infinite	infinite animate__delay-2s"></i>
               </button>
-
               {/* Menu / Avatar */}
               <div className="flex items-center gap-2">
                 {!login && (
@@ -279,10 +287,9 @@ export default function Navbar() {
                       data-dropdown-toggle="dropdownHover"
                       className="w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center hover:bg-gray-100 transition"
                     >
-                      <i className="fa-solid fa-bars text-gray-800"></i>
+                      <i className="fa-solid fa-user-plus text-gray-600"></i>
                     </button>
 
-                    {/* Dropdown MENU LOGIN - SIGNUP */}
                     <div
                       id="dropdownHover"
                       className="hidden absolute right-0 mt-2 w-35 bg-white border border-gray-200 rounded-xl shadow-lg z-50"
@@ -322,7 +329,6 @@ export default function Navbar() {
 
                 {renderIcon()}
               </div>
-
               {/* Mobile Hamburger */}
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
@@ -393,7 +399,7 @@ export default function Navbar() {
                     id="diaDiem"
                     type="text"
                     placeholder="Tìm kiếm điểm đến"
-                    className="bg-transparent focus:ring-0 focus:outline-none border-none text-sm placeholder:text-gray-500 w-full cursor-pointer"
+                    className="bg-transparent focus:ring-0 px-0 focus:outline-none border-none text-sm placeholder:text-gray-500 w-full cursor-pointer"
                   />
                 </div>
               </div>
@@ -414,7 +420,21 @@ export default function Navbar() {
                   </label>
                   <input
                     type="date"
-                    className="bg-transparent focus:ring-0 focus:outline-none border-none text-sm w-full cursor-pointer"
+                    className="bg-transparent focus:ring-0 p-0 focus:outline-none border-none text-sm w-full cursor-pointer"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const today = new Date().toISOString().split("T")[0];
+                      if (value < today) {
+                        alert(
+                          "Ngày nhận phòng không được nhỏ hơn ngày hiện tại!"
+                        );
+                        return;
+                      }
+                      setBooking((prev) => ({
+                        ...prev,
+                        checkin: e.target.value,
+                      }));
+                    }}
                   />
                 </div>
               </div>
@@ -435,7 +455,21 @@ export default function Navbar() {
                   </label>
                   <input
                     type="date"
-                    className="bg-transparent focus:ring-0 focus:outline-none border-none text-sm w-full cursor-pointer"
+                    className="bg-transparent focus:ring-0 p-0 focus:outline-none border-none text-sm w-full cursor-pointer"
+                    onChange={(e) => {
+                      const value = e.target.value;
+
+                      if (booking.checkin && value < booking.checkin) {
+                        alert(
+                          "Ngày trả phòng không được nhỏ hơn ngày nhận phòng!"
+                        );
+                        return;
+                      }
+                      setBooking((prev) => ({
+                        ...prev,
+                        checkout: e.target.value,
+                      }));
+                    }}
                   />
                 </div>
               </div>
@@ -446,7 +480,18 @@ export default function Navbar() {
                   <label className="block text-xs font-semibold text-gray-800">
                     Khách
                   </label>
-                  <span className="text-sm text-gray-500">Thêm khách</span>
+                  <input
+                    type="number"
+                    min={1}
+                    placeholder="Thêm khách"
+                    className="bg-transparent focus:ring-0 focus:outline-none p-0 border-none text-sm placeholder:text-gray-500 cursor-pointer"
+                    onChange={(e) =>
+                      setBooking((prev) => ({
+                        ...prev,
+                        guests: Number(e.target.value),
+                      }))
+                    }
+                  />
                 </div>
 
                 <button
