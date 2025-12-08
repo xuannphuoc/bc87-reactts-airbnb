@@ -5,7 +5,7 @@ const menu = [
   { title: "Users", path: "/admin/user" },
   { title: "Locations", path: "/admin/location" },
   { title: "Rooms", path: "/admin/room" },
-  { title: "Orders", path: "/admin/booking" },
+  { title: "Bookings", path: "/admin/booking" },
 ];
 
 export default function Sidebar() {
