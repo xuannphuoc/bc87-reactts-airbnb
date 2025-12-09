@@ -50,7 +50,7 @@ export default function Navbar() {
       setIsMobile(window.innerWidth < 768);
     };
 
-    checkScreen(); // chạy lần đầu khi load
+    checkScreen();
 
     window.addEventListener("resize", checkScreen);
     return () => window.removeEventListener("resize", checkScreen);
@@ -138,7 +138,7 @@ export default function Navbar() {
     if (idSring) {
       const idJson = JSON.parse(idSring);
       dispatch(getDataRoom(idJson));
-      navigate(`detail/${idJson}`);
+      navigate(`detail/${idJson}/${inputLocaton}`);
     }
   };
 
@@ -241,7 +241,6 @@ export default function Navbar() {
               </span>
             </div>
 
-            {/* Middle - Menu (Desktop) */}
             <div className="hidden md:flex col-span-8 lg:col-span-6 justify-center">
               <ul className="flex space-x-6 font-medium text-gray-700">
                 <li>
@@ -528,7 +527,7 @@ export default function Navbar() {
                   <div className="col-span-1 ">
                     <img
                       src={location.hinhAnh}
-                      alt=""
+                      alt="hinhanh"
                       className="w-10 h-10 rounded-lg"
                     />
                   </div>

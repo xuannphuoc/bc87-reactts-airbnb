@@ -12,6 +12,7 @@ import { type FormBookRom } from "./bookRoom";
 import { initFlowbite, Modal } from "flowbite";
 import { useContext } from "react";
 import { BookingContext } from "../../../context/BookingContext.tsx";
+
 type Props = {
   cmt: Comments;
 };
@@ -130,13 +131,13 @@ export default function Room() {
 
   // get maPhong
   const { id: maPhong } = useParams();
-  //  get user
 
+  //  get user
   const userString =
     localStorage.getItem("userLogin") || sessionStorage.getItem("userLogin");
 
-  const user = userString ? JSON.parse(userString) : null;
-  const userData = user?.user ?? null;
+  const parsed = userString ? JSON.parse(userString) : null;
+  const userData = parsed?.user;
 
   // get Room
   let room = null;
@@ -184,48 +185,50 @@ export default function Room() {
   const formattedDate = `${today.getFullYear()}-${String(
     today.getMonth() + 1
   ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}T00:00:00`;
+
   const [data, setData] = useState<PostComment>({
     maPhong: Number(maPhong),
-    maNguoiBinhLuan: userData?.id ?? 0,
+    maNguoiBinhLuan: userData?.id,
     ngayBinhLuan: formattedDate,
     noiDung: "",
     saoBinhLuan: 0,
   });
-
   // post form
   useEffect(() => {
     initFlowbite();
   }, []);
   const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+
     const userString =
       localStorage.getItem("userLogin") || sessionStorage.getItem("userLogin");
+    const parsed = userString ? JSON.parse(userString) : null;
 
-    const user = userString ? JSON.parse(userString) : null;
-    console.log(user);
-    const userData = user?.user ?? null;
-    if (!userData) {
+    const userData = parsed?.user ?? parsed;
+
+    const userId = userData?.id || userData?.maNguoiDung;
+
+    if (!userId) {
       alert("Bạn cần đăng nhập để tiếp tục!");
 
-      // mở modal đăng nhập
       const modalEl = document.getElementById("authentication-modal");
+
       if (modalEl) {
-        const modal = new Modal(modalEl, {
-          placement: "center",
-          backdrop: "dynamic",
-          closable: true,
-        });
+        const modal = new Modal(modalEl);
         modal.show();
-      } else {
-        document
-          .getElementById("authentication-modal")
-          ?.classList.add("hidden");
       }
 
       return;
     }
-    distpatch(bookRoomReducer(form));
+
+    distpatch(
+      bookRoomReducer({
+        ...form,
+        maNguoiDung: userId,
+      })
+    );
   };
+
   // calc money
 
   const [money, setMoney] = useState({
@@ -285,7 +288,6 @@ export default function Room() {
         )}
         {room && (
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10">
-            {/* LEFT CONTENT (giữ nguyên logic) */}
             <div className="md:col-span-8">
               <hr className="text-gray-600" />
               <div className="my-6 md:my-10">
@@ -507,7 +509,6 @@ export default function Room() {
               </div>
             </div>
 
-            {/* BOOK Room (giữ nguyên logic và handlers) */}
             <div className="md:col-span-4">
               <h1 className="text-center font-bold text-2xl md:text-2xl">
                 Đặt phòng
@@ -598,7 +599,6 @@ export default function Room() {
                           <div className="flex justify-between items-center w-full mt-2">
                             <span>
                               <span>{form.soLuongKhach} khách</span>
-                              khách
                             </span>
 
                             <div className="flex justify-around items-center gap-3">
@@ -756,8 +756,8 @@ export default function Room() {
       {/* input comment  */}
       <div className="flex gap-6 items-center">
         <div className="">
-          {user?.hinhAnh ? (
-            <img src={user?.hinhAnh} alt="" />
+          {userData?.avatar ? (
+            <img src={userData?.avatar} alt="" />
           ) : (
             <img
               className="w-15 h-15 rounded-full hover:bg-amber-50"

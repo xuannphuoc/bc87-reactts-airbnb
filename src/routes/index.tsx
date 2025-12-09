@@ -24,7 +24,7 @@ const routes: Route[] = [
     nested: [
       { path: "", element: HomePage },
       { path: "room/:id", element: Room },
-      { path: "detail/:id", element: DetailRoomPage },
+      { path: "detail/:id/:location", element: DetailRoomPage },
     ],
   },
   {
