@@ -99,7 +99,7 @@ export default function Room() {
   const context = useContext(BookingContext);
   if (!context) return null;
 
-  const { booking } = context;
+  const { booking, setBooking } = context;
 
   const roomData = useSelector((state: RootState) => state.getDataRoomSlice);
   const comment = useSelector((state: RootState) => state.commentSlice.data);
