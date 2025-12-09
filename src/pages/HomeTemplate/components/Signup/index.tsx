@@ -18,43 +18,6 @@ export default function Signup() {
   const phoneRegex = /^(03|05|07|08|09)[0-9]{8}$/;
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
   const dateRegex = /^(0?[1-9]|[12][0-9]|3[01])[\/](0?[1-9]|1[0-2])[\/]\d{4}$/;
-  const validateField = (name: string, value: string) => {
-    let message = "";
-
-    switch (name) {
-      case "name":
-        if (!value.trim()) message = "Tên không được để trống";
-        break;
-
-      case "email":
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!value.trim()) message = "Email không được để trống";
-        else if (!emailRegex.test(value)) message = "Email không hợp lệ";
-        break;
-
-      case "password":
-        if (!value.trim()) message = "Mật khẩu không được để trống";
-        else if (value.length < 6) message = "Mật khẩu phải tối thiểu 6 ký tự";
-        break;
-
-      case "phone":
-        const phoneRegex = /^[0-9]{9,11}$/;
-        if (!value.trim()) message = "Số điện thoại không được để trống";
-        else if (!phoneRegex.test(value))
-          message = "Số điện thoại phải là số và 9–11 ký tự";
-        break;
-
-      case "birthday":
-        if (!value.trim()) message = "Ngày sinh không được để trống";
-        break;
-
-      case "gender":
-        if (!value) message = "Vui lòng chọn giới tính";
-        break;
-    }
-
-    setErrors((prev) => ({ ...prev, [name]: message }));
-  };
 
   useEffect(() => {
     if (data) {
