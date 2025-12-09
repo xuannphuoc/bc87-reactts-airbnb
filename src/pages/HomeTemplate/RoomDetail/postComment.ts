@@ -21,7 +21,6 @@ const initialState: Stateslice = {
   error: null,
 };
 let token = null;
-
 const localData = localStorage.getItem("userLogin");
 const sessionData = sessionStorage.getItem("userLogin");
 

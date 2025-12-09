@@ -34,7 +34,6 @@ export default function Signup() {
   }, [data]);
 
   const [acount, setAcount] = useState<Account>({
-    // id: 0,
     name: "",
     email: "",
     password: "",

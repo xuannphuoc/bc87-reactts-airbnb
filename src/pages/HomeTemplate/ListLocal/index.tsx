@@ -3,10 +3,10 @@ import { type RootState } from "../../../store";
 import Room from "./room";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-
+import { useParams } from "react-router-dom";
 export default function DetailRoomPage() {
   const data = useSelector((state: RootState) => state.RoomSlice.data);
-  console.log(data);
+  const { location } = useParams();
   const dispatch = useDispatch();
   useEffect(() => {
     if (data && data.length > 0) {
@@ -39,8 +39,8 @@ export default function DetailRoomPage() {
           <div className="w-full">
             <iframe
               className="rounded-2xl w-full h-[400px] md:h-[600px]"
-              src={`https://www.google.com/maps?q${encodeURIComponent(
-                "Cần Thơ"
+              src={`https://www.google.com/maps?q=${encodeURIComponent(
+                location || "Hồ Chí Minh"
               )}&output=embed`}
               loading="lazy"
             ></iframe>
