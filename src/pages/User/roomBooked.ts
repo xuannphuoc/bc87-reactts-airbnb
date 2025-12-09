@@ -1,6 +1,7 @@
 import { type DetailRoom } from "../HomeTemplate/components/Navbar/getRoom";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+
 export interface UserRoomsState {
   roomIds: number[];
   rooms: DetailRoom[];
@@ -8,22 +9,39 @@ export interface UserRoomsState {
   error: string | null;
 }
 
+function chunkArray<T>(array: T[], size: number): T[][] {
+  const result: T[][] = [];
+  for (let i = 0; i < array.length; i += size) {
+    result.push(array.slice(i, i + size));
+  }
+  return result;
+}
+
 export const getRoomsDetail = createAsyncThunk<DetailRoom[], number[]>(
   "getRoomsDetail",
   async (roomIds, { rejectWithValue }) => {
     try {
-      const promises = roomIds.map((id) =>
-        axios({
-          url: `https://airbnbnew.cybersoft.edu.vn/api/phong-thue/${id}`,
-          method: "GET",
-          headers: {
-            tokenCybersoft:
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCA4NyIsIkhldEhhblN0cmluZyI6IjIzLzAzLzIwMjYiLCJIZXRIYW5UaW1lIjoiMTc3NDIyNDAwMDAwMCIsIm5iZiI6MTc0NzI0MjAwMCwiZXhwIjoxNzc0MzcxNjAwfQ.-W4bvmZuRBJxryMtPHaMnmm11rdGxNTYol7fLRQid1g",
-          },
-        })
-      );
-      const responses = await Promise.all(promises);
-      return responses.map((res) => res.data.content);
+      const chunks = chunkArray(roomIds, 5);
+      const results: DetailRoom[] = [];
+
+      for (const chunk of chunks) {
+        const responses = await Promise.all(
+          chunk.map((id) =>
+            axios.get(
+              `https://airbnbnew.cybersoft.edu.vn/api/phong-thue/${id}`,
+              {
+                headers: {
+                  tokenCybersoft:
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCA4NyIsIkhldEhhblN0cmluZyI6IjIzLzAzLzIwMjYiLCJIZXRIYW5UaW1lIjoiMTc3NDIyNDAwMDAwMCIsIm5iZiI6MTc0NzI0MjAwMCwiZXhwIjoxNzc0MzcxNjAwfQ.-W4bvmZuRBJxryMtPHaMnmm11rdGxNTYol7fLRQid1g",
+                },
+              }
+            )
+          )
+        );
+        results.push(...responses.map((res) => res.data.content));
+      }
+
+      return results;
     } catch (error: any) {
       return rejectWithValue(error.message);
     }

@@ -109,6 +109,13 @@ export default function Body({ user }: Props) {
       />
     </div>
   );
+  useEffect(() => {
+    if (success) {
+      const modalEl = document.getElementById("popup-modal");
+      if (modalEl) modalEl.classList.add("hidden");
+      alert("Cập nhật thông tin thành công!");
+    }
+  }, [success]);
 
   return (
     <div className="container mx-auto mt-10 px-4">
@@ -180,7 +187,7 @@ export default function Body({ user }: Props) {
               {rooms.length > 0
                 ? rooms.map((room: DetailRoom) => (
                     <div
-                      key={room.id}
+                      key={room.id + "-"}
                       className="p-4 hover:shadow-md transition flex flex-col sm:flex-row gap-4"
                     >
                       <img
@@ -317,6 +324,7 @@ export default function Body({ user }: Props) {
                 className="flex flex-col gap-4 text-left"
                 onSubmit={handleSubmit}
               >
+                {/* Họ và tên */}
                 <label className="flex flex-col text-sm">
                   Họ và tên
                   <input
@@ -326,8 +334,14 @@ export default function Body({ user }: Props) {
                     onChange={handleChange}
                     className="border rounded px-2 py-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
                   />
+                  {!formUser.name && (
+                    <span className="text-red-500 text-xs mt-1">
+                      Tên không được để trống
+                    </span>
+                  )}
                 </label>
 
+                {/* Email */}
                 <label className="flex flex-col text-sm">
                   Email
                   <input
@@ -337,8 +351,15 @@ export default function Body({ user }: Props) {
                     onChange={handleChange}
                     className="border rounded px-2 py-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
                   />
+                  {formUser.email &&
+                    !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formUser.email) && (
+                      <span className="text-red-500 text-xs mt-1">
+                        Email không hợp lệ
+                      </span>
+                    )}
                 </label>
 
+                {/* Số điện thoại */}
                 <label className="flex flex-col text-sm">
                   Số điện thoại
                   <input
@@ -348,8 +369,14 @@ export default function Body({ user }: Props) {
                     onChange={handleChange}
                     className="border rounded px-2 py-1 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
                   />
+                  {formUser.phone && !/^\d{10}$/.test(formUser.phone) && (
+                    <span className="text-red-500 text-xs mt-1">
+                      Số điện thoại phải đủ 10 số và chỉ chứa số
+                    </span>
+                  )}
                 </label>
 
+                {/* Ngày sinh */}
                 <label className="flex flex-col text-sm">
                   Ngày sinh
                   <input
@@ -365,8 +392,14 @@ export default function Body({ user }: Props) {
                   <button
                     type="submit"
                     className="bg-red-400 hover:bg-red-600 cursor-pointer rounded-xl text-white px-4 py-2 focus:outline-none"
+                    disabled={
+                      !formUser.name ||
+                      !formUser.email ||
+                      !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(formUser.email) ||
+                      !/^\d{10}$/.test(formUser.phone)
+                    }
                   >
-                    Chỉnh sửa hồ sơ
+                    Cập nhật thông tin
                   </button>
                   <button
                     type="button"

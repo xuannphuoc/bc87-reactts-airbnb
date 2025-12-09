@@ -534,24 +534,25 @@ export default function Room() {
                             </label>
                             <input
                               name="ngayDen"
+                              value={booking.checkin.split("T")[0]}
+                              className="border-0 p-0 focus:ring-0 focus:outline-none w-full text-sm"
                               onChange={(e) => {
                                 const value = e.target.value;
-
                                 if (value < istoday) {
                                   alert(
                                     "Ngày nhận phòng không được nhỏ hơn ngày hiện tại!"
                                   );
                                   return;
                                 }
-
                                 setForm({
                                   ...form,
                                   ngayDen: `${value}T00:00:00`,
                                 });
+                                setBooking((prev) => ({
+                                  ...prev,
+                                  checkin: `${value}T00:00:00`,
+                                }));
                               }}
-                              value={booking.checkin}
-                              id="nhanPhong"
-                              className="border-0 p-0 focus:ring-0 focus:outline-none w-full text-sm"
                               type="date"
                             />
                           </div>
@@ -566,25 +567,26 @@ export default function Room() {
                             </label>
                             <input
                               name="ngayDi"
+                              value={booking.checkout.split("T")[0]}
+                              className="border-0 p-0 focus:ring-0 focus:outline-none w-full text-sm"
                               onChange={(e) => {
                                 const value = e.target.value;
                                 const checkin = form.ngayDen?.split("T")[0];
-
                                 if (checkin && value < checkin) {
                                   alert(
                                     "Ngày trả phòng không được nhỏ hơn ngày nhận phòng!"
                                   );
                                   return;
                                 }
-
                                 setForm({
                                   ...form,
                                   ngayDi: `${value}T00:00:00`,
                                 });
+                                setBooking((prev) => ({
+                                  ...prev,
+                                  checkout: `${value}T00:00:00`,
+                                }));
                               }}
-                              value={booking.checkout}
-                              id="traPhong"
-                              className="border-0 p-0 focus:ring-0 focus:outline-none w-full text-sm"
                               type="date"
                             />
                           </div>
