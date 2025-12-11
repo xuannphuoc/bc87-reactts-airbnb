@@ -78,7 +78,7 @@ export default function Topbar() {
           fontWeight: 600,
         }}
       >
-        Admin Dashboard
+        Admin
         <div className="flex items-center">
           <div className="flex items-center ms-3 relative" ref={dropdownRef}>
             <div>
@@ -188,7 +188,6 @@ export default function Topbar() {
         </div>
       </div>
 
-      {/* User Profile Modal */}
       <UserProfileModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

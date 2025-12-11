@@ -22,7 +22,7 @@ interface FormData {
 const Modal = ({ title, children, onClose }: any) => (
   <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-50">
     <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between p-4 border-b ">
         <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
         <button onClick={onClose} className="text-gray-400 hover:text-gray-900">
           <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -385,7 +385,7 @@ export default function ManageBooking() {
                     currentItems.map((booking) => (
                       <tr
                         key={booking.id}
-                        className="bg-white border-b hover:bg-gray-50"
+                        className="bg-white border-b dark:border-gray-100 hover:bg-gray-50"
                       >
                         <td className="px-6 py-4 font-medium text-gray-900">
                           {booking.id}

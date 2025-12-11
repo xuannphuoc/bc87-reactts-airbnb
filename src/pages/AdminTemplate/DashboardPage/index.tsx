@@ -15,7 +15,6 @@ export default function DashboardPage() {
       </h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
-        {/* Cards */}
         <Card className="shadow-lg bg-pink-500 text-white border-none hover:bg-pink-600 transition-all">
           <div className="flex items-center gap-4">
             <HiUserGroup className="text-white text-4xl" />
@@ -57,7 +56,6 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* TABLE */}
       <Card className="shadow-lg border border-pink-400 bg-white p-0 rounded-xl max-w-4xl mx-auto">
         <div className="p-6">
           <h2 className="text-2xl font-semibold text-pink-600 text-center mb-6">

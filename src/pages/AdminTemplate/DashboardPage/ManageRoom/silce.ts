@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "./../../../../services/apiServices";
 
-// Types
 export interface Room {
   id: number;
   tenPhong: string;
@@ -31,7 +30,6 @@ interface RoomState {
   selectedRoom: Room | null;
 }
 
-// Async thunks
 export const fetchRooms = createAsyncThunk(
   "room/fetchRooms",
   async (_, { rejectWithValue }) => {
@@ -130,7 +128,6 @@ export const uploadRoomImage = createAsyncThunk(
   }
 );
 
-// Initial state
 const initialState: RoomState = {
   rooms: [],
   isLoading: false,
@@ -138,7 +135,6 @@ const initialState: RoomState = {
   selectedRoom: null,
 };
 
-// Slice
 const roomReducer = createSlice({
   name: "room",
   initialState,
@@ -151,7 +147,6 @@ const roomReducer = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // Fetch rooms
     builder.addCase(fetchRooms.pending, (state) => {
       state.isLoading = true;
       state.error = null;
@@ -165,7 +160,6 @@ const roomReducer = createSlice({
       state.error = action.payload as string;
     });
 
-    // Fetch room by id
     builder.addCase(fetchRoomById.pending, (state) => {
       state.isLoading = true;
       state.error = null;
@@ -179,7 +173,6 @@ const roomReducer = createSlice({
       state.error = action.payload as string;
     });
 
-    // Create room
     builder.addCase(createRoom.pending, (state) => {
       state.isLoading = true;
       state.error = null;
@@ -193,7 +186,6 @@ const roomReducer = createSlice({
       state.error = action.payload as string;
     });
 
-    // Update room
     builder.addCase(updateRoom.pending, (state) => {
       state.isLoading = true;
       state.error = null;
@@ -212,7 +204,6 @@ const roomReducer = createSlice({
       state.error = action.payload as string;
     });
 
-    // Delete room
     builder.addCase(deleteRoom.pending, (state) => {
       state.isLoading = true;
       state.error = null;
@@ -226,7 +217,6 @@ const roomReducer = createSlice({
       state.error = action.payload as string;
     });
 
-    // Upload room image
     builder.addCase(uploadRoomImage.pending, (state) => {
       state.isLoading = true;
       state.error = null;
