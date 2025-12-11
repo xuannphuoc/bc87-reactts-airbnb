@@ -425,9 +425,9 @@ export default function ManageUser() {
             <>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left text-gray-500">
-                  <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                  <thead className="text-xs text-gray-500 uppercase bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3">ID</th>
+                      <th className="px-6 py-3 ">ID</th>
                       <th className="px-6 py-3">Họ tên</th>
                       <th className="px-6 py-3">Email</th>
                       <th className="px-6 py-3">Số điện thoại</th>

@@ -12,8 +12,73 @@ import {
 } from "./slice";
 import type { AppDispatch, RootState } from "./../../../../store/index";
 
+const Modal = ({ title, children, onClose }: any) => (
+  <div className="fixed inset-0 bg-gray-900 dark:bg-gray-900 bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+          {title}
+        </h3>
+        <button
+          onClick={onClose}
+          className="text-gray-400 hover:text-gray-900 dark:hover:text-white"
+        >
+          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fillRule="evenodd"
+              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </button>
+      </div>
+      {children}
+    </div>
+  </div>
+);
+
+interface FormInputProps {
+  label: string;
+  name: string;
+  type?: string;
+  required?: boolean;
+  placeholder?: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  error?: string;
+}
+
+const FormInput: React.FC<FormInputProps> = ({
+  label,
+  name,
+  type = "text",
+  required = false,
+  placeholder = "",
+  value,
+  onChange,
+  error,
+}) => (
+  <div>
+    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+      {label} {required && <span className="text-red-600">*</span>}
+    </label>
+    <input
+      type={type}
+      name={name}
+      value={value}
+      onChange={onChange}
+      className={`bg-gray-50 dark:bg-gray-700 border ${
+        error ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+      } text-gray-900 dark:text-white text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5 dark:placeholder-gray-400`}
+      placeholder={placeholder}
+    />
+    {error && (
+      <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>
+    )}
+  </div>
+);
+
 export default function ManageLocation() {
-  // Redux
   const dispatch = useDispatch<AppDispatch>();
   const { locations, loading, error, selectedLocation } = useSelector(
     (state: RootState) => state.locationReducer
@@ -22,7 +87,6 @@ export default function ManageLocation() {
   const [filteredLocations, setFilteredLocations] = useState<Location[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Modals
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
@@ -108,6 +172,13 @@ export default function ManageLocation() {
     setFormErrors({});
   };
 
+  const handleInputChange = (name: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
   const handleAddLocation = async () => {
     if (!validateForm()) return;
 
@@ -178,70 +249,10 @@ export default function ManageLocation() {
     setShowDeleteModal(true);
   };
 
-  const Modal = ({ title, children, onClose }: any) => (
-    <div className="fixed inset-0 bg-gray-900 dark:bg-gray-900 bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-            {title}
-          </h3>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-900 dark:hover:text-white"
-          >
-            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-              <path
-                fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-
-  const FormInput = ({
-    label,
-    name,
-    type = "text",
-    required = false,
-    placeholder = "",
-  }: any) => (
-    <div>
-      <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-        {label} {required && <span className="text-red-600">*</span>}
-      </label>
-      <input
-        type={type}
-        name={name}
-        value={formData[name as keyof LocationFormData]}
-        onChange={(e) => {
-          setFormData((prev) => ({ ...prev, [name]: e.target.value }));
-          if (formErrors[name])
-            setFormErrors((prev) => ({ ...prev, [name]: "" }));
-        }}
-        className={`bg-gray-50 dark:bg-gray-700 border ${
-          formErrors[name]
-            ? "border-red-500"
-            : "border-gray-300 dark:border-gray-600"
-        } text-gray-900 dark:text-white text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5 dark:placeholder-gray-400`}
-        placeholder={placeholder}
-      />
-      {formErrors[name] && (
-        <p className="mt-2 text-sm text-red-600 dark:text-red-400">
-          {formErrors[name]}
-        </p>
-      )}
-    </div>
-  );
-
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
+    <div className="min-h-screen bg-gray-900 dark:bg-gray-50 p-4">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-6 p-6">
+        <div className="bg-gray-900 dark:bg-gray-50 rounded-lg shadow mb-6 p-6">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center">
               <svg
@@ -256,7 +267,7 @@ export default function ManageLocation() {
                 />
               </svg>
               <div className="ml-4">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-2xl font-bold text-white dark:text-gray-900">
                   Quản lý Vị trí
                 </h1>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -290,7 +301,7 @@ export default function ManageLocation() {
           </div>
         )}
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow mb-6 p-4">
+        <div className="bg-gray-800 dark:bg-gray-50 rounded-lg shadow mb-6 p-4">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
               <svg
@@ -309,14 +320,13 @@ export default function ManageLocation() {
               type="text"
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
-              className="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full pl-10 p-2.5 dark:placeholder-gray-400"
+              className="bg-gray-700 dark:bg-gray-50 border border-gray-600 dark:border-gray-300 text-white dark:text-gray-900 text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full pl-10 p-2.5 dark:placeholder-gray-400"
               placeholder="Tìm kiếm theo tên vị trí, tỉnh thành, quốc gia..."
             />
           </div>
         </div>
 
-        {/* Table */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+        <div className="bg-gray-800 dark:bg-gray-50 rounded-lg shadow overflow-hidden">
           {loading && filteredLocations.length === 0 ? (
             <div className="p-8 text-center">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-rose-600"></div>
@@ -327,7 +337,7 @@ export default function ManageLocation() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                <thead className="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50 dark:bg-gray-700">
+                <thead className="text-xs text-gray-100 dark:text-gray-600 uppercase bg-gray-700 dark:bg-gray-100">
                   <tr>
                     <th className="px-6 py-3">ID</th>
                     <th className="px-6 py-3">Hình ảnh</th>
@@ -351,9 +361,9 @@ export default function ManageLocation() {
                     filteredLocations.map((location) => (
                       <tr
                         key={location.id}
-                        className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                        className="bg-gray-800 border-b hover:bg-gray-700 dark:bg-gray-50 dark:border-gray-50 dark:hover:bg-gray-100"
                       >
-                        <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                        <td className="px-6 py-4 font-medium text-gray-50 dark:text-gray-700">
                           {location.id}
                         </td>
                         <td className="px-6 py-4">
@@ -367,9 +377,7 @@ export default function ManageLocation() {
                             }}
                           />
                         </td>
-                        <td className="px-6 py-4 text-gray-900 dark:text-white">
-                          {location.tenViTri}
-                        </td>
+                        <td className="px-6 py-4">{location.tenViTri}</td>
                         <td className="px-6 py-4">{location.tinhThanh}</td>
                         <td className="px-6 py-4">{location.quocGia}</td>
                         <td className="px-6 py-4">
@@ -435,49 +443,71 @@ export default function ManageLocation() {
 
         {showAddModal && (
           <Modal title="Thêm vị trí mới" onClose={() => setShowAddModal(false)}>
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormInput
-                  label="Tên vị trí"
-                  name="tenViTri"
-                  required
-                  placeholder="Hồ Hoàn Kiếm"
-                />
-                <FormInput
-                  label="Tỉnh thành"
-                  name="tinhThanh"
-                  required
-                  placeholder="Hà Nội"
-                />
-                <FormInput
-                  label="Quốc gia"
-                  name="quocGia"
-                  required
-                  placeholder="Việt Nam"
-                />
-                <FormInput
-                  label="URL hình ảnh"
-                  name="hinhAnh"
-                  required
-                  placeholder="https://example.com/image.jpg"
-                />
+            <>
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormInput
+                    label="Tên vị trí"
+                    name="tenViTri"
+                    required
+                    placeholder="Hồ Hoàn Kiếm"
+                    value={formData.tenViTri}
+                    onChange={(e) =>
+                      handleInputChange("tenViTri", e.target.value)
+                    }
+                    error={formErrors.tenViTri}
+                  />
+                  <FormInput
+                    label="Tỉnh thành"
+                    name="tinhThanh"
+                    required
+                    placeholder="Hà Nội"
+                    value={formData.tinhThanh}
+                    onChange={(e) =>
+                      handleInputChange("tinhThanh", e.target.value)
+                    }
+                    error={formErrors.tinhThanh}
+                  />
+                  <FormInput
+                    label="Quốc gia"
+                    name="quocGia"
+                    required
+                    placeholder="Việt Nam"
+                    value={formData.quocGia}
+                    onChange={(e) =>
+                      handleInputChange("quocGia", e.target.value)
+                    }
+                    error={formErrors.quocGia}
+                  />
+                  <FormInput
+                    label="URL hình ảnh"
+                    name="hinhAnh"
+                    required
+                    placeholder="https://example.com/image.jpg"
+                    value={formData.hinhAnh}
+                    onChange={(e) =>
+                      handleInputChange("hinhAnh", e.target.value)
+                    }
+                    error={formErrors.hinhAnh}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="flex items-center justify-end gap-3 p-4 border-t dark:border-gray-700">
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 font-medium rounded-lg text-sm px-5 py-2.5"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={handleAddLocation}
-                disabled={loading}
-                className="text-white bg-rose-600 hover:bg-rose-700 font-medium rounded-lg text-sm px-5 py-2.5 disabled:opacity-50"
-              >
-                Thêm vị trí
-              </button>
-            </div>
+              <div className="flex items-center justify-end gap-3 p-4 border-t dark:border-gray-700">
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  className="text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 font-medium rounded-lg text-sm px-5 py-2.5"
+                >
+                  Hủy
+                </button>
+                <button
+                  onClick={handleAddLocation}
+                  disabled={loading}
+                  className="text-white bg-rose-600 hover:bg-rose-700 font-medium rounded-lg text-sm px-5 py-2.5 disabled:opacity-50"
+                >
+                  Thêm vị trí
+                </button>
+              </div>
+            </>
           </Modal>
         )}
 
@@ -486,49 +516,71 @@ export default function ManageLocation() {
             title="Chỉnh sửa vị trí"
             onClose={() => setShowEditModal(false)}
           >
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormInput
-                  label="Tên vị trí"
-                  name="tenViTri"
-                  required
-                  placeholder="Hồ Hoàn Kiếm"
-                />
-                <FormInput
-                  label="Tỉnh thành"
-                  name="tinhThanh"
-                  required
-                  placeholder="Hà Nội"
-                />
-                <FormInput
-                  label="Quốc gia"
-                  name="quocGia"
-                  required
-                  placeholder="Việt Nam"
-                />
-                <FormInput
-                  label="URL hình ảnh"
-                  name="hinhAnh"
-                  required
-                  placeholder="https://example.com/image.jpg"
-                />
+            <>
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormInput
+                    label="Tên vị trí"
+                    name="tenViTri"
+                    required
+                    placeholder="Hồ Hoàn Kiếm"
+                    value={formData.tenViTri}
+                    onChange={(e) =>
+                      handleInputChange("tenViTri", e.target.value)
+                    }
+                    error={formErrors.tenViTri}
+                  />
+                  <FormInput
+                    label="Tỉnh thành"
+                    name="tinhThanh"
+                    required
+                    placeholder="Hà Nội"
+                    value={formData.tinhThanh}
+                    onChange={(e) =>
+                      handleInputChange("tinhThanh", e.target.value)
+                    }
+                    error={formErrors.tinhThanh}
+                  />
+                  <FormInput
+                    label="Quốc gia"
+                    name="quocGia"
+                    required
+                    placeholder="Việt Nam"
+                    value={formData.quocGia}
+                    onChange={(e) =>
+                      handleInputChange("quocGia", e.target.value)
+                    }
+                    error={formErrors.quocGia}
+                  />
+                  <FormInput
+                    label="URL hình ảnh"
+                    name="hinhAnh"
+                    required
+                    placeholder="https://example.com/image.jpg"
+                    value={formData.hinhAnh}
+                    onChange={(e) =>
+                      handleInputChange("hinhAnh", e.target.value)
+                    }
+                    error={formErrors.hinhAnh}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="flex items-center justify-end gap-3 p-4 border-t dark:border-gray-700">
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 font-medium rounded-lg text-sm px-5 py-2.5"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={handleEditLocation}
-                disabled={loading}
-                className="text-white bg-rose-600 hover:bg-rose-700 font-medium rounded-lg text-sm px-5 py-2.5 disabled:opacity-50"
-              >
-                Cập nhật
-              </button>
-            </div>
+              <div className="flex items-center justify-end gap-3 p-4 border-t dark:border-gray-700">
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 font-medium rounded-lg text-sm px-5 py-2.5"
+                >
+                  Hủy
+                </button>
+                <button
+                  onClick={handleEditLocation}
+                  disabled={loading}
+                  className="text-white bg-rose-600 hover:bg-rose-700 font-medium rounded-lg text-sm px-5 py-2.5 disabled:opacity-50"
+                >
+                  Cập nhật
+                </button>
+              </div>
+            </>
           </Modal>
         )}
 
@@ -537,110 +589,114 @@ export default function ManageLocation() {
             title="Thông tin vị trí"
             onClose={() => setShowViewModal(false)}
           >
-            <div className="p-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-center mb-6">
-                  <img
-                    src={selectedLocation.hinhAnh}
-                    alt={selectedLocation.tenViTri}
-                    className="w-48 h-48 object-cover rounded-lg"
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        "https://via.placeholder.com/192?text=No+Image";
-                    }}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                      ID
-                    </p>
-                    <p className="text-base text-gray-900 dark:text-white">
-                      {selectedLocation.id}
-                    </p>
+            <>
+              <div className="p-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-center mb-6">
+                    <img
+                      src={selectedLocation.hinhAnh}
+                      alt={selectedLocation.tenViTri}
+                      className="w-48 h-48 object-cover rounded-lg"
+                      onError={(e) => {
+                        e.currentTarget.src =
+                          "https://via.placeholder.com/192?text=No+Image";
+                      }}
+                    />
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                      Tên vị trí
-                    </p>
-                    <p className="text-base text-gray-900 dark:text-white">
-                      {selectedLocation.tenViTri}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                      Tỉnh thành
-                    </p>
-                    <p className="text-base text-gray-900 dark:text-white">
-                      {selectedLocation.tinhThanh}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                      Quốc gia
-                    </p>
-                    <p className="text-base text-gray-900 dark:text-white">
-                      {selectedLocation.quocGia}
-                    </p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        ID
+                      </p>
+                      <p className="text-base text-gray-900 dark:text-white">
+                        {selectedLocation.id}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        Tên vị trí
+                      </p>
+                      <p className="text-base text-gray-900 dark:text-white">
+                        {selectedLocation.tenViTri}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        Tỉnh thành
+                      </p>
+                      <p className="text-base text-gray-900 dark:text-white">
+                        {selectedLocation.tinhThanh}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        Quốc gia
+                      </p>
+                      <p className="text-base text-gray-900 dark:text-white">
+                        {selectedLocation.quocGia}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="flex items-center justify-end gap-3 p-4 border-t dark:border-gray-700">
-              <button
-                onClick={() => setShowViewModal(false)}
-                className="text-white bg-rose-600 hover:bg-rose-700 font-medium rounded-lg text-sm px-5 py-2.5"
-              >
-                Đóng
-              </button>
-            </div>
+              <div className="flex items-center justify-end gap-3 p-4 border-t dark:border-gray-700">
+                <button
+                  onClick={() => setShowViewModal(false)}
+                  className="text-white bg-rose-600 hover:bg-rose-700 font-medium rounded-lg text-sm px-5 py-2.5"
+                >
+                  Đóng
+                </button>
+              </div>
+            </>
           </Modal>
         )}
 
         {showDeleteModal && selectedLocation && (
           <Modal title="Xác nhận xóa" onClose={() => setShowDeleteModal(false)}>
-            <div className="p-6">
-              <div className="flex items-center mb-4">
-                <div className="shrink-0 w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                  <svg
-                    className="w-6 h-6 text-red-600 dark:text-red-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                    Xóa vị trí
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    Bạn có chắc chắn muốn xóa vị trí{" "}
-                    <strong>{selectedLocation.tenViTri}</strong>? Hành động này
-                    không thể hoàn tác.
-                  </p>
+            <>
+              <div className="p-6">
+                <div className="flex items-center mb-4">
+                  <div className="shrink-0 w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                    <svg
+                      className="w-6 h-6 text-red-600 dark:text-red-400"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div className="ml-4">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                      Xóa vị trí
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      Bạn có chắc chắn muốn xóa vị trí{" "}
+                      <strong>{selectedLocation.tenViTri}</strong>? Hành động
+                      này không thể hoàn tác.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="flex items-center justify-end gap-3 p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 font-medium rounded-lg text-sm px-5 py-2.5"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={handleDeleteLocation}
-                disabled={loading}
-                className="text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-sm px-5 py-2.5 disabled:opacity-50"
-              >
-                Xóa
-              </button>
-            </div>
+              <div className="flex items-center justify-end gap-3 p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 font-medium rounded-lg text-sm px-5 py-2.5"
+                >
+                  Hủy
+                </button>
+                <button
+                  onClick={handleDeleteLocation}
+                  disabled={loading}
+                  className="text-white bg-red-600 hover:bg-red-700 font-medium rounded-lg text-sm px-5 py-2.5 disabled:opacity-50"
+                >
+                  Xóa
+                </button>
+              </div>
+            </>
           </Modal>
         )}
       </div>

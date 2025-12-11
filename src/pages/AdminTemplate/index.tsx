@@ -4,16 +4,8 @@ import { useSelector } from "react-redux";
 import Sidebar from "./_components/Sidebar";
 import Topbar from "./_components/Topbar";
 
-// import { useEffect } from "react";
-// import Navbar from "./_components/Navbar";
-
 export default function AdminTemplate() {
   const data = useSelector((state: RootState) => state.authReducer.data);
-  // const dispatch = useDispatch<AppDispatch>();
-
-  // useEffect(() => {
-  //   dispatch(tryAutoLogin());
-  // }, [dispatch]);
 
   if (!data) {
     return <Navigate to={"/auth"} />;

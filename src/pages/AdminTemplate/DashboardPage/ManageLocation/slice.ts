@@ -1,7 +1,10 @@
-import { createSlice, createAsyncThunk,type PayloadAction } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  createAsyncThunk,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
 import api from "./../../../../services/apiServices";
 
-// Types
 export interface Location {
   id: number;
   tenViTri: string;
@@ -31,7 +34,6 @@ const initialState: LocationState = {
   selectedLocation: null,
 };
 
-// Async Thunks
 export const fetchLocations = createAsyncThunk(
   "location/fetchLocations",
   async (_, { rejectWithValue }) => {
@@ -113,7 +115,6 @@ export const uploadLocationImage = createAsyncThunk(
   }
 );
 
-
 const locationReducer = createSlice({
   name: "location",
   initialState,
@@ -127,7 +128,7 @@ const locationReducer = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch Locations
+
       .addCase(fetchLocations.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -140,7 +141,7 @@ const locationReducer = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-      // Create Location
+
       .addCase(createLocation.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -153,7 +154,7 @@ const locationReducer = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-      // Update Location
+
       .addCase(updateLocation.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -171,7 +172,7 @@ const locationReducer = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-      // Delete Location
+
       .addCase(deleteLocation.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -186,7 +187,7 @@ const locationReducer = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-      // Upload Image
+
       .addCase(uploadLocationImage.fulfilled, (state, action) => {
         const index = state.locations.findIndex(
           (loc) => loc.id === action.payload.id

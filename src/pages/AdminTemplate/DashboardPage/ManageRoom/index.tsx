@@ -401,20 +401,41 @@ export default function ManageRoom() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Quản Lý Phòng</h1>
-            <p className="mt-1 text-sm text-gray-600">
-              Quản lý danh sách phòng cho thuê trên hệ thống
-            </p>
+        <div className="bg-white dark:bg-white rounded-lg shadow mb-6 p-6">
+          <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center">
+              <svg
+                className="w-12 h-12 text-rose-600 dark:text-rose-500"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width={24}
+                height={24}
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5 5a1 1 0 0 0 1-1 1 1 0 1 1 2 0 1 1 0 0 0 1 1h1a1 1 0 0 0 1-1 1 1 0 1 1 2 0 1 1 0 0 0 1 1h1a1 1 0 0 0 1-1 1 1 0 1 1 2 0 1 1 0 0 0 1 1 2 2 0 0 1 2 2v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a2 2 0 0 1 2-2ZM3 19v-7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Zm6.01-6a1 1 0 1 0-2 0 1 1 0 0 0 2 0Zm2 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0Zm6 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0Zm-10 4a1 1 0 1 1 2 0 1 1 0 0 1-2 0Zm6 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0Zm2 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <div className="ml-4">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-900">
+                  Quản Lý Phòng
+                </h1>
+                <p className="mt-1 text-sm text-gray-600">
+                  Hệ thống Airbnb Admin
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => handleOpenModal()}
+              className="inline-flex items-center px-4 py-2.5 bg-rose-500 hover:bg-rose-600 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm"
+            >
+              <HiPlus className="mr-2 h-5 w-5" />
+              Thêm Phòng
+            </button>
           </div>
-          <button
-            onClick={() => handleOpenModal()}
-            className="inline-flex items-center px-4 py-2.5 bg-rose-500 hover:bg-rose-600 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm"
-          >
-            <HiPlus className="mr-2 h-5 w-5" />
-            Thêm Phòng
-          </button>
         </div>
 
         {error && (
