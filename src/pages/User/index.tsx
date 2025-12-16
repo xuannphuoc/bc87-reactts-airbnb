@@ -7,10 +7,10 @@ import {
 import { initFlowbite } from "flowbite";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { store, type AppDispatch, type RootState } from "../../store/index.ts";
+// import { useDispatch, useSelector } from "react-redux";
+// import { store, type AppDispatch, type RootState } from "../../store/index.ts";
 
-import { getUserReducer } from "./getUser.ts";
+// import { getUserReducer } from "./getUser.ts";
 export default function User() {
   const [login, setLogin] = useState(false);
   const [userLogin, setUser] = useState<User | null>({
@@ -18,19 +18,19 @@ export default function User() {
     token: "",
   });
   const navigative = useNavigate();
-  const distpatch = useDispatch<AppDispatch>();
+  // const distpatch = useDispatch<AppDispatch>();
 
-  const [userCurrent, setUserCurrent] = useState<UserData | null>(null);
+  // const [userCurrent, setUserCurrent] = useState<UserData | null>(null);
 
   useEffect(() => {
     const storedUser =
       localStorage.getItem("userLogin") || sessionStorage.getItem("userLogin");
     if (!storedUser) return;
     try {
-      const parseJson = JSON.parse(storedUser);
+      // const parseJson = JSON.parse(storedUser);
       setUser(JSON.parse(storedUser));
-      const { user } = parseJson;
-      setUserCurrent(user);
+      // const { user } = parseJson;
+      // setUserCurrent(user);
       setLogin(true);
     } catch (error) {
       console.log(error);

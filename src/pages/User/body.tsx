@@ -6,7 +6,7 @@ import type { AppDispatch, RootState } from "../../store";
 import { type DetailRoom } from "../HomeTemplate/components/Navbar/getRoom";
 import { type PutUser } from "./putUser";
 import { putUserReducer } from "./putUser";
-import { deleteReducer } from "./deleteRoom";
+// import { deleteReducer } from "./deleteRoom";
 type Props = {
   user?: UserData | null;
 };
