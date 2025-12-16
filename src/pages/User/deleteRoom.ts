@@ -39,9 +39,9 @@ const deleteSlice = createSlice({
       state.loading = false;
       state.data = action.payload;
     });
-    builder.addCase(deleteReducer.rejected, (state, action) => {
-      state.loading = false;
-    });
+    // builder.addCase(deleteReducer.rejected, (state, action) => {
+    //   state.loading = false;
+    // });
   },
 });
 
