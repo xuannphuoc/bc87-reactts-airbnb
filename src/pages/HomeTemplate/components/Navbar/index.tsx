@@ -32,7 +32,6 @@ export interface User {
 
 export default function Navbar() {
   const context = useContext(BookingContext);
-
   if (!context) return null;
   const { booking, setBooking } = context;
   const [login, setLogin] = useState(false);
@@ -147,7 +146,7 @@ export default function Navbar() {
       dispatch(getRoomByUserReducer(user.user.id));
       dispatch(getUserReducer(user.user.id));
     } else {
-      console.log("vui long dang nhap");
+      console.log("Vui lòng đăng nhập");
     }
   };
   const renderIcon = () => {

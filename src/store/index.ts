@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../pages/AdminTemplate/AuthPage/slice";
-import userTbReducer from "../pages/AdminTemplate/_components/Topbar/slice"
+import userTbReducer from "../pages/AdminTemplate/_components/Topbar/slice";
 import userReducer from "./../pages/AdminTemplate/DashboardPage/ManageUser/slice";
 import roomReducer from "./../pages/AdminTemplate/DashboardPage/ManageRoom/silce";
 import locationReducer from "./../pages/AdminTemplate/DashboardPage/ManageLocation/slice";
@@ -19,6 +19,7 @@ import getRoomByUserSlice from "./../pages/User/getRoomByUser";
 import putUserSlice from "./../pages/User/getRoomByUser";
 import getUserSlice from "./../pages/User/getRoomByUser";
 import userRoomsSlice from "./../pages/User/roomBooked";
+import deleteSlice from "./../pages/User/deleteRoom";
 export const store = configureStore({
   reducer: {
     authReducer,
@@ -41,6 +42,7 @@ export const store = configureStore({
     putUserSlice,
     getUserSlice,
     userRoomsSlice,
+    deleteSlice,
   },
 });
 
