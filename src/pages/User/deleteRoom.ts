@@ -1,28 +1,19 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { AxiosError } from "axios";
 
 import axios from "axios";
 
-import { type UserData } from "../HomeTemplate/components/Navbar";
-
-export interface UserState {
-  data: UserData | null;
-  loading: boolean;
-  error: null | AxiosError;
-}
-
-const initialState: UserState = {
+const initialState = {
   data: null,
   loading: false,
   error: null,
 };
 
-export const getUserReducer = createAsyncThunk<UserData, number>(
-  "getUserReducer",
+export const deleteReducer = createAsyncThunk(
+  "deleteReducer",
   async (id, { rejectWithValue }) => {
     try {
       const response = await axios({
-        url: `https://airbnbnew.cybersoft.edu.vn/api/users/${id}`,
+        url: `https://airbnbnew.cybersoft.edu.vn/api/dat-phong/${id}`,
         method: "GET",
         headers: {
           tokenCybersoft:
@@ -36,23 +27,22 @@ export const getUserReducer = createAsyncThunk<UserData, number>(
   }
 );
 
-const getUserSlice = createSlice({
+const deleteSlice = createSlice({
   name: "getUserSlice",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(getUserReducer.pending, (state) => {
+    builder.addCase(deleteReducer.pending, (state) => {
       state.loading = true;
     });
-    builder.addCase(getUserReducer.fulfilled, (state, action) => {
+    builder.addCase(deleteReducer.fulfilled, (state, action) => {
       state.loading = false;
       state.data = action.payload;
     });
-    builder.addCase(getUserReducer.rejected, (state, action) => {
+    builder.addCase(deleteReducer.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.payload as AxiosError;
     });
   },
 });
 
-export default getUserSlice.reducer;
+export default deleteSlice.reducer;

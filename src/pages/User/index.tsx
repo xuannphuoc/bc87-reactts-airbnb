@@ -7,25 +7,39 @@ import {
 import { initFlowbite } from "flowbite";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import type { RootState } from "../../store";
+import { useDispatch, useSelector } from "react-redux";
+import { store, type AppDispatch, type RootState } from "../../store/index.ts";
 
+import { getUserReducer } from "./getUser.ts";
 export default function User() {
   const [login, setLogin] = useState(false);
-  const [user, setUser] = useState<User | null>({
+  const [userLogin, setUser] = useState<User | null>({
     user: {} as UserData,
     token: "",
   });
   const navigative = useNavigate();
+  const distpatch = useDispatch<AppDispatch>();
+
+  const [userCurrent, setUserCurrent] = useState<UserData | null>(null);
 
   useEffect(() => {
     const storedUser =
       localStorage.getItem("userLogin") || sessionStorage.getItem("userLogin");
-    if (storedUser) {
+    if (!storedUser) return;
+    try {
+      const parseJson = JSON.parse(storedUser);
       setUser(JSON.parse(storedUser));
+      const { user } = parseJson;
+      setUserCurrent(user);
       setLogin(true);
+    } catch (error) {
+      console.log(error);
     }
   }, []);
+
+  // useEffect(() => {
+  //   distpatch(getUserReducer());
+  // });
 
   useEffect(() => {
     setTimeout(() => {
@@ -33,8 +47,6 @@ export default function User() {
     }, 100);
   }, []);
 
-  const userData = useSelector((state: RootState) => state.getUserSlice.data);
-  console.log(userData);
   const logout = () => {
     localStorage.removeItem("userLogin");
     sessionStorage.removeItem("userLogin");
@@ -61,10 +73,10 @@ export default function User() {
           className="relative"
         >
           <div className="">
-            {user?.user && user?.user.avatar !== "" ? (
+            {userLogin?.user && userLogin?.user.avatar !== "" ? (
               <img
                 className="w-10 h-10 rounded-full hover:bg-amber-50"
-                src={user.user.avatar}
+                src={userLogin.user.avatar}
                 alt=""
               />
             ) : (
@@ -196,7 +208,7 @@ export default function User() {
         </div>
       </nav>
 
-      <Body user={user?.user} />
+      <Body user={userLogin?.user} />
     </div>
   );
 }

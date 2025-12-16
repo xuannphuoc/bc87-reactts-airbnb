@@ -6,18 +6,13 @@ import type { AppDispatch, RootState } from "../../store";
 import { type DetailRoom } from "../HomeTemplate/components/Navbar/getRoom";
 import { type PutUser } from "./putUser";
 import { putUserReducer } from "./putUser";
+import { deleteReducer } from "./deleteRoom";
 type Props = {
   user?: UserData | null;
 };
 
 export default function Body({ user }: Props) {
   const dispatch = useDispatch<AppDispatch>();
-
-  const storedUser =
-    JSON.parse(localStorage.getItem("userLogin") || "null")?.user ||
-    JSON.parse(sessionStorage.getItem("userLogin") || "null")?.user;
-
-  const currentUser = user || storedUser || null;
 
   const [formUser, setFormUser] = useState<PutUser>({
     id: 0,
@@ -28,9 +23,14 @@ export default function Body({ user }: Props) {
     gender: true,
     role: "USER",
   });
+  const [isSubmit, setIsSubmit] = useState(false);
+  const storedUser =
+    JSON.parse(localStorage.getItem("userLogin") || "null")?.user ||
+    JSON.parse(sessionStorage.getItem("userLogin") || "null")?.user;
+
+  const currentUser = user || storedUser || null;
 
   const putUserState = useSelector((state: RootState) => state.putUserSlice);
-  const { loading: updating, success, error: updateError } = putUserState;
 
   useEffect(() => {
     if (currentUser) {
@@ -53,7 +53,6 @@ export default function Body({ user }: Props) {
       });
     }
   }, [currentUser]);
-  console.log(formUser);
   const roomIds = useSelector(
     (state: RootState) =>
       state.getRoomByUserSlice.data?.map((r) => r.maPhong) || []
@@ -68,7 +67,7 @@ export default function Body({ user }: Props) {
   const error = useSelector((state: RootState) => state.userRoomsSlice.error);
 
   const [rooms, setRooms] = useState<DetailRoom[]>([]);
-
+  console.log(rooms);
   useEffect(() => {
     if (roomIds.length > 0) {
       dispatch(getRoomsDetail(roomIds));
@@ -96,9 +95,12 @@ export default function Body({ user }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submit formUser:", formUser);
+    setIsSubmit(true);
     dispatch(putUserReducer(formUser));
   };
+  // const handleDelteRoom = (rooms?.id) => {
+  //   dispatch(deleteReducer(id));
+  // }
 
   const renderAvatar = () => (
     <div className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-full overflow-hidden">
@@ -109,14 +111,17 @@ export default function Body({ user }: Props) {
       />
     </div>
   );
+
   useEffect(() => {
-    if (success) {
+    if (isSubmit) {
       const modalEl = document.getElementById("popup-modal");
+      document.getElementById("flowbite-close-modal")?.click();
       if (modalEl) modalEl.classList.add("hidden");
       alert("Cập nhật thông tin thành công!");
+      setIsSubmit(false);
     }
-  }, [success]);
-
+  }, [isSubmit]);
+  console.log("putUserState:", putUserState);
   return (
     <div className="container mx-auto mt-10 px-4">
       <div className="flex flex-col md:flex-row md:gap-8">
@@ -188,82 +193,135 @@ export default function Body({ user }: Props) {
                 ? rooms.map((room: DetailRoom) => (
                     <div
                       key={room.id + "-"}
-                      className="p-4 hover:shadow-md transition flex flex-col sm:flex-row gap-4"
+                      className="
+          group
+          p-4
+          border
+          rounded-xl
+          bg-white
+          transition
+          hover:shadow-md
+          flex
+          flex-col
+          gap-4
+        "
                     >
-                      <img
-                        src={room.hinhAnh}
-                        alt={room.tenPhong}
-                        className="sm:w-48 h-40 object-cover rounded-md"
-                      />
-                      <div className="flex flex-col justify-between">
-                        <h3 className="font-semibold text-lg mb-2">
-                          {room.tenPhong}
-                        </h3>
-                        <div className="flex flex-wrap gap-3 text-sm mb-2">
-                          <p>
-                            <span className="font-semibold">Khách:</span>{" "}
-                            {room.khach}
-                          </p>
-                          <p>
-                            <span className="font-semibold">Phòng ngủ:</span>{" "}
-                            {room.phongNgu}
-                          </p>
-                          <p>
-                            <span className="font-semibold">Giường:</span>{" "}
-                            {room.giuong}
-                          </p>
-                          <p>
-                            <span className="font-semibold">Phòng tắm:</span>{" "}
-                            {room.phongTam}
-                          </p>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <div className="flex flex-wrap gap-2 text-xs sm:text-sm">
-                            {room.mayGiat && (
-                              <span className="px-2 py-1 bg-gray-200 rounded">
-                                Máy giặt
-                              </span>
-                            )}
-                            {room.banLa && (
-                              <span className="px-2 py-1 bg-gray-200 rounded">
-                                Bàn ủi
-                              </span>
-                            )}
-                            {room.tivi && (
-                              <span className="px-2 py-1 bg-gray-200 rounded">
-                                Tivi
-                              </span>
-                            )}
-                            {room.dieuHoa && (
-                              <span className="px-2 py-1 bg-gray-200 rounded">
-                                Điều hòa
-                              </span>
-                            )}
-                            {room.wifi && (
-                              <span className="px-2 py-1 bg-gray-200 rounded">
-                                Wi-Fi
-                              </span>
-                            )}
-                            {room.bep && (
-                              <span className="px-2 py-1 bg-gray-200 rounded">
-                                Bếp
-                              </span>
-                            )}
-                            {room.doXe && (
-                              <span className="px-2 py-1 bg-gray-200 rounded">
-                                Đỗ xe
-                              </span>
-                            )}
-                            {room.hoBoi && (
-                              <span className="px-2 py-1 bg-gray-200 rounded">
-                                Hồ bơi
-                              </span>
-                            )}
+                      {/* ===== PHẦN TRÊN: THÔNG TIN PHÒNG ===== */}
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        <img
+                          src={room.hinhAnh}
+                          alt={room.tenPhong}
+                          className="sm:w-48 h-40 object-cover rounded-md"
+                        />
+
+                        <div className="flex flex-col justify-between flex-1">
+                          <div>
+                            <h3 className="font-semibold text-lg mb-2">
+                              {room.tenPhong}
+                            </h3>
+
+                            <div className="flex flex-wrap gap-3 text-sm mb-2">
+                              <p>
+                                <span className="font-semibold">Khách:</span>{" "}
+                                {room.khach}
+                              </p>
+                              <p>
+                                <span className="font-semibold">
+                                  Phòng ngủ:
+                                </span>{" "}
+                                {room.phongNgu}
+                              </p>
+                              <p>
+                                <span className="font-semibold">Giường:</span>{" "}
+                                {room.giuong}
+                              </p>
+                              <p>
+                                <span className="font-semibold">
+                                  Phòng tắm:
+                                </span>{" "}
+                                {room.phongTam}
+                              </p>
+                            </div>
                           </div>
-                          <p className="font-semibold text-base">
-                            ${room.giaTien.toLocaleString()}/tháng
-                          </p>
+
+                          <div className="flex justify-between items-center mt-2">
+                            <div className="flex flex-wrap gap-2 text-xs sm:text-sm">
+                              {room.mayGiat && (
+                                <span className="px-2 py-1 bg-gray-200 rounded">
+                                  Máy giặt
+                                </span>
+                              )}
+                              {room.banLa && (
+                                <span className="px-2 py-1 bg-gray-200 rounded">
+                                  Bàn ủi
+                                </span>
+                              )}
+                              {room.tivi && (
+                                <span className="px-2 py-1 bg-gray-200 rounded">
+                                  Tivi
+                                </span>
+                              )}
+                              {room.dieuHoa && (
+                                <span className="px-2 py-1 bg-gray-200 rounded">
+                                  Điều hòa
+                                </span>
+                              )}
+                              {room.wifi && (
+                                <span className="px-2 py-1 bg-gray-200 rounded">
+                                  Wi-Fi
+                                </span>
+                              )}
+                              {room.bep && (
+                                <span className="px-2 py-1 bg-gray-200 rounded">
+                                  Bếp
+                                </span>
+                              )}
+                              {room.doXe && (
+                                <span className="px-2 py-1 bg-gray-200 rounded">
+                                  Đỗ xe
+                                </span>
+                              )}
+                              {room.hoBoi && (
+                                <span className="px-2 py-1 bg-gray-200 rounded">
+                                  Hồ bơi
+                                </span>
+                              )}
+                            </div>
+
+                            <p className="font-semibold text-base">
+                              ${room.giaTien.toLocaleString()}/tháng
+                            </p>
+                          </div>
                         </div>
+                      </div>
+
+                      <div
+                        className="
+            overflow-hidden
+            max-h-0
+            opacity-0
+            group-hover:max-h-20
+            group-hover:opacity-100
+            transition-all
+            duration-500
+            ease-in-out
+          "
+                      >
+                        <button
+                          className="
+              w-full
+              mt-2
+              bg-red-500
+              hover:bg-red-600
+              text-white
+              py-2
+              rounded-lg
+              text-sm
+              cursor-pointer
+            "
+                        >
+                          Xóa phòng
+                        </button>
                       </div>
                     </div>
                   ))
@@ -273,17 +331,6 @@ export default function Body({ user }: Props) {
         </div>
       </div>
 
-      {updating && (
-        <p className="text-blue-500 mb-2">Đang cập nhật thông tin...</p>
-      )}
-      {success && (
-        <p className="text-green-600 mb-2">Cập nhật thông tin thành công!</p>
-      )}
-      {updateError && (
-        <p className="text-red-500 mb-2">
-          Lỗi: {updateError.message || "Có lỗi xảy ra"}
-        </p>
-      )}
       {/* Modal */}
       <div
         id="popup-modal"
@@ -294,6 +341,7 @@ export default function Body({ user }: Props) {
           <div className="relative bg-white rounded-2xl border shadow-sm p-4 md:p-6">
             <button
               type="button"
+              id="flowbite-close-modal"
               className="absolute top-3 right-2.5 text-body bg-transparent hover:bg-neutral-tertiary hover:text-heading rounded-base text-sm w-9 h-9 inline-flex justify-center items-center"
               data-modal-hide="popup-modal"
             >
