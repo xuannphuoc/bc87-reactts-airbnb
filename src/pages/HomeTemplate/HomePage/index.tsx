@@ -1,6 +1,11 @@
-import Discover from "./components/Discover/discover";
+import Discover from "./Discover/discover";
+import { useEffect } from "react";
+import { initFlowbite } from "flowbite";
 
 export default function HomePage() {
+  useEffect(() => {
+    initFlowbite();
+  }, []);
   return (
     <div className="w-full">
       <div className="bg-black/5 px-4 py-4 sm:px-6 md:px-10 lg:px-16 lg:py-10">
@@ -122,7 +127,7 @@ export default function HomePage() {
         </h1>
       </div>
 
-      <div className="container mx-auto py-10">
+      <div className="container mx-auto py-15 px-2">
         <Discover />
       </div>
     </div>

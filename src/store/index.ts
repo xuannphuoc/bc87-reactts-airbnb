@@ -1,25 +1,25 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "../pages/AdminTemplate/AuthPage/slice";
-import userTbReducer from "../pages/AdminTemplate/_components/Topbar/slice";
-import userReducer from "./../pages/AdminTemplate/DashboardPage/ManageUser/slice";
-import roomReducer from "./../pages/AdminTemplate/DashboardPage/ManageRoom/silce";
-import locationReducer from "./../pages/AdminTemplate/DashboardPage/ManageLocation/slice";
-import bookingReducer from "./../pages/AdminTemplate/DashboardPage/ManageBooking/slice";
-import LocationSlice from "./../pages/HomeTemplate/components/Navbar/slice";
-import getDataPageSlice from "./../pages/HomeTemplate/HomePage/components/Discover/discoverSlice";
-import SignUpReducer from "../pages/HomeTemplate/components/Signup/slice";
-import LoginReducer from "../pages/HomeTemplate/components/Signin/slice";
-import RoomSlice from "./../pages/HomeTemplate/components/Navbar/getRoom";
-import getDataRoomSlice from "./../pages/HomeTemplate/ListLocal/getDetailRoom";
-import commentSlice from "./../pages/HomeTemplate/ListLocal/getComment";
-import postCommentReducer from "./../pages/HomeTemplate/RoomDetail/postComment";
-import getLocalIdSlice from "./../pages/HomeTemplate/ListLocal/getLocalId";
-import bookRoomSlice from "./../pages/HomeTemplate/RoomDetail/bookRoom";
-import getRoomByUserSlice from "./../pages/User/getRoomByUser";
-import putUserSlice from "./../pages/User/getRoomByUser";
-import getUserSlice from "./../pages/User/getRoomByUser";
-import userRoomsSlice from "./../pages/User/roomBooked";
-import deleteSlice from "./../pages/User/deleteRoom";
+import authReducer from "@/pages/AdminTemplate/AuthPage/slice";
+import userTbReducer from "@/pages/AdminTemplate/_components/Topbar/slice";
+import userReducer from "@/pages/AdminTemplate/DashboardPage/ManageUser/slice";
+import roomReducer from "@/pages/AdminTemplate/DashboardPage/ManageRoom/silce";
+import locationReducer from "@/pages/AdminTemplate/DashboardPage/ManageLocation/slice";
+import bookingReducer from "@/pages/AdminTemplate/DashboardPage/ManageBooking/slice";
+import LocationSlice from "@/pages/HomeTemplate/components/getAPI/navbar";
+import getDataPageSlice from "@/pages/HomeTemplate/HomePage/Discover/discoverSlice";
+import SignUpReducer from "@/pages/HomeTemplate/components/Register/register";
+import LoginReducer from "@/pages/HomeTemplate/components/Login/login";
+import listDataRoomSlice from "@/pages/HomeTemplate/components/getAPI/getListRoom";
+import detailRoomSlice from "@/pages/HomeTemplate/ListLocal/getAPI/getDetailRoom.ts";
+import commentSlice from "@/pages/HomeTemplate/ListLocal/getAPI/getComment.ts";
+import postCommentReducer from "@/pages/HomeTemplate/RoomDetail/getAPI/postComment.ts";
+import getLocalIdSlice from "@/pages/HomeTemplate/ListLocal/getAPI/getLocalId.ts";
+import bookRoomSlice from "@/pages/HomeTemplate/RoomDetail/getAPI/bookRoom.ts";
+import putUserSlice from "@/pages/User/getAPI/putUser.ts";
+import getUserSlice from "@/pages/User/getAPI/getUser.ts";
+import userRoomsSlice from "@/pages/User/getAPI/roomBooked";
+import roomByUserSlice from "@/pages/User/getAPI/getRoomByUser";
+import putAvatarSlice from "@/pages/User/getAPI/uploadAvatar";
 export const store = configureStore({
   reducer: {
     authReducer,
@@ -32,17 +32,17 @@ export const store = configureStore({
     getDataPageSlice,
     SignUpReducer,
     LoginReducer,
-    RoomSlice,
-    getDataRoomSlice,
+    listDataRoomSlice,
+    detailRoomSlice,
     commentSlice,
     postCommentReducer,
     getLocalIdSlice,
     bookRoomSlice,
-    getRoomByUserSlice,
+    roomByUserSlice,
     putUserSlice,
     getUserSlice,
     userRoomsSlice,
-    deleteSlice,
+    putAvatarSlice,
   },
 });
 

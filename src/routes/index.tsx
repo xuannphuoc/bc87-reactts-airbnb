@@ -4,7 +4,7 @@ import DashboardPage from "../pages/AdminTemplate/DashboardPage";
 import HomeTemplate from "../pages/HomeTemplate";
 import DetailRoomPage from "../pages/HomeTemplate/ListLocal";
 import HomePage from "../pages/HomeTemplate/HomePage";
-import Room from "../pages/HomeTemplate/RoomDetail";
+import Room from "../pages/HomeTemplate/RoomDetail/room";
 import { Route } from "react-router-dom";
 import User from "./../pages/User";
 import ManageRoom from "../pages/AdminTemplate/DashboardPage/ManageRoom";

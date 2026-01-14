@@ -1,36 +1,22 @@
 import { useSelector } from "react-redux";
 import { type RootState } from "../../../store";
-import Room from "./room";
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import Room from "./room/room";
 import { useParams } from "react-router-dom";
+
 export default function DetailRoomPage() {
-  const data = useSelector((state: RootState) => state.RoomSlice.data);
   const { location } = useParams();
-  const dispatch = useDispatch();
-  useEffect(() => {
-    if (data && data.length > 0) {
-      sessionStorage.setItem("dataRoom", JSON.stringify(data));
-    }
-  }, [data]);
-
-  useEffect(() => {
-    if (!data) {
-      const stored = sessionStorage.getItem("dataRoom");
-      if (stored) {
-        const dataStored = JSON.parse(stored);
-        if (Array.isArray(dataStored)) {
-          dispatch({ type: "RoomSlice/setData", payload: dataStored });
-        }
-      }
-    }
-  }, [data, dispatch]);
-
-  const renderRoom = () => {
-    if (!Array.isArray(data)) return null;
-    return data?.map((room) => <Room key={room.id} room={room} />);
-  };
-
+  const { data, loading } = useSelector(
+    (state: RootState) => state.listDataRoomSlice
+  );
+  if (loading) {
+    return <p className="text-center mt-10">Đang tải phòng...</p>;
+  }
+  const filterBtn =
+    "text-gray-700 bg-white border border-gray-300 text-sm px-4 py-2.5 rounded-full \
+   transition-all duration-300 ease-out \
+   hover:-translate-y-0.5 hover:shadow-md \
+   hover:border-pink-400 hover:text-pink-600 \
+   active:scale-95 cursor-pointer";
   return (
     <div className="py-10 px-4">
       <div className="container mx-auto">
@@ -54,25 +40,29 @@ export default function DetailRoomPage() {
             </h1>
 
             <div className="mt-2 flex gap-3 flex-wrap">
-              <button className="text-black border hover:bg-gray-100 text-sm px-4 py-2.5 rounded-xl">
-                Loại nơi ở
-              </button>
-              <button className="text-black border hover:bg-gray-100 text-sm px-4 py-2.5 rounded-xl">
-                Giá
-              </button>
-              <button className="text-black border hover:bg-gray-100 text-sm px-4 py-2.5 rounded-xl">
-                Đặt ngay
-              </button>
-              <button className="text-black border hover:bg-gray-100 text-sm px-4 py-2.5 rounded-xl">
-                Phòng và phòng ngủ
-              </button>
-              <button className="text-black border hover:bg-gray-100 text-sm px-4 py-2.5 rounded-xl">
-                Bộ lọc khác
-              </button>
+              <button className={filterBtn}>🏠 Loại nơi ở</button>
+
+              <button className={filterBtn}>💰 Giá</button>
+
+              <button className={filterBtn}>⚡ Đặt ngay</button>
+
+              <button className={filterBtn}>🛏️ Phòng & phòng ngủ</button>
+
+              <button className={filterBtn}>🎯 Bộ lọc khác</button>
             </div>
 
             {/* detailroom */}
-            <div className="grid grid-cols-1 mt-6">{renderRoom()}</div>
+            {Array.isArray(data) && data.length > 0 ? (
+              <div className="grid grid-cols-1 mt-6">
+                {data.map((room) => {
+                  return <Room key={room.id} room={room} />;
+                })}
+              </div>
+            ) : (
+              <p className="text-center text-gray-500 mt-6">
+                Phòng chưa được cập nhật
+              </p>
+            )}
           </div>
         </div>
       </div>
