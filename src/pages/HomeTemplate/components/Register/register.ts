@@ -47,10 +47,17 @@ export const SignUp = createAsyncThunk(
 const SignUpReducer = createSlice({
   name: "SignUpReducer",
   initialState,
-  reducers: {},
+  reducers: {
+    resetAuthState: (state) => {
+      state.loading =false,
+      state.data = null,
+      state.error =null
+    }
+  },
   extraReducers: (builder) => {
     builder.addCase(SignUp.pending, (state) => {
       state.loading = true;
+    
     });
     builder.addCase(SignUp.fulfilled, (state, action) => {
       state.loading = false;
@@ -62,5 +69,5 @@ const SignUpReducer = createSlice({
     });
   },
 });
-
+export const { resetAuthState } = SignUpReducer.actions;
 export default SignUpReducer.reducer;

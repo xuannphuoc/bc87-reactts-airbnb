@@ -1,14 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
 import { type AppDispatch, type RootState } from "../../../store";
 import { useState, useEffect, useContext } from "react";
-import { type PostComment } from "./getAPI/postComment";
+import { resetComment, type PostComment } from "./getAPI/postComment";
 import { useParams } from "react-router-dom";
-import { type FormBookRom } from "./getAPI/bookRoom";
+import { resetBookRoom, type FormBookRom } from "./getAPI/bookRoom";
 import { initFlowbite } from "flowbite";
 import { BookingContext } from "../../../context/BookingContext";
 import BookingBox from "./Component/BookingBox";
 import CommentBlock from "./Component/CommentBlock";
-
+import { toast } from "react-hot-toast";
 export default function Room() {
   const istoday = new Date().toISOString().split("T")[0];
 
@@ -118,7 +118,28 @@ export default function Room() {
   useEffect(() => {
     initFlowbite();
   }, []);
-
+  // alert booking
+  useEffect(() => {
+    if (bookRoomState.data) {
+      toast.success("Đặt phòng thành công");
+      dispatch(resetBookRoom());
+    }
+    if (bookRoomState.error) {
+      toast.error("Đăt phòng thất bại");
+      dispatch(resetBookRoom());
+    }
+  });
+  // alert Comment
+  useEffect(() => {
+    if (postCommentState.data) {
+      toast.success("Bạn đã comment");
+      dispatch(resetComment());
+    }
+    if (postCommentState.error) {
+      toast.error("");
+      dispatch(resetComment());
+    }
+  });
   return (
     <div className="container mx-auto my-10 p-5">
       {room && (
@@ -353,6 +374,7 @@ export default function Room() {
               </div>
             </div>
             <BookingBox
+              loading={bookRoomState.loading}
               room={room}
               form={form}
               setForm={setForm}
@@ -361,6 +383,7 @@ export default function Room() {
             />
           </div>
           <CommentBlock
+            loading={postCommentState.loading}
             comment={comment}
             data={data}
             setData={setData}

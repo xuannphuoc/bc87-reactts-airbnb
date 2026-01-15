@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { type AppDispatch, type RootState } from "../../../../store/index";
 import { useDispatch, useSelector } from "react-redux";
 import { Login } from "./login.ts";
-import { type StateInitial } from "./login.ts";
 import { initFlowbite } from "flowbite";
 import type { UserData } from "../_Type/type.tsx";
+import { resetLogin } from "./login.ts";
 interface SigninProps {
   onLoginSuccess: (user: UserData) => void;
 }
@@ -13,47 +13,65 @@ export type Account = {
   password: string;
 };
 export default function Signin({ onLoginSuccess }: SigninProps) {
-  const [acount, setCount] = useState({
+  const [account, setAccount] = useState<Account>({
     email: "",
     password: "",
   });
   const validateForm = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!acount.email) {
+    if (!account.email) {
       alert("Vui lòng nhập email!");
       return false;
     }
 
-    if (!emailRegex.test(acount.email)) {
+    if (!emailRegex.test(account.email)) {
       alert("Email không hợp lệ!");
       return false;
     }
 
-    if (!acount.password) {
+    if (!account.password) {
       alert("Vui lòng nhập mật khẩu!");
       return false;
     }
 
-    if (acount.password.length < 6) {
+    if (account.password.length < 6) {
       alert("Mật khẩu phải có ít nhất 6 ký tự!");
       return false;
     }
 
     return true;
   };
+  const [showError, SetShowError] = useState<string | null>(null);
+  const { data, loading, error } = useSelector(
+    (state: RootState) => state.LoginReducer
+  );
+
   const renderFlowbite = () => {
     setTimeout(() => {
       initFlowbite();
     }, 1);
   };
-  const state = useSelector<RootState>((state) => state.LoginReducer);
-  const { data } = state as StateInitial;
+
+  useEffect(() => {
+    if (error) {
+      SetShowError(error);
+      const timer = setTimeout(() => {
+        SetShowError(null);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
   const [remember, setRemember] = useState(false);
   useEffect(() => {
     if (data) {
-      alert("Đăng nhập thành công");
       onLoginSuccess(data);
+      setAccount({
+        email: "",
+        password: "",
+      });
       if (remember) {
         localStorage.setItem("userLogin", JSON.stringify(data));
       } else {
@@ -63,25 +81,25 @@ export default function Signin({ onLoginSuccess }: SigninProps) {
         '#authentication-modal [data-modal-hide="authentication-modal"]'
       );
       closeBtn?.click();
+      distpatch(resetLogin());
     }
   }, [data]);
 
   const distpatch = useDispatch<AppDispatch>();
 
   const handleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
     const { name, value } = e.target;
-    setCount({
-      ...acount,
+    setAccount((pre) => ({
+      ...pre,
       [name]: value,
-    });
+    }));
   };
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>, acount: Account) => {
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>, account: Account) => {
     e.preventDefault();
 
     if (!validateForm()) return;
 
-    distpatch(Login(acount));
+    distpatch(Login(account));
   };
 
   return (
@@ -96,7 +114,9 @@ export default function Signin({ onLoginSuccess }: SigninProps) {
         <div className="relative bg-white rounded-lg shadow-sm ">
           {/* Modal header */}
           <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t ">
-            <h3 className="text-xl font-semibold  ">Đăng nhập tài khoản</h3>
+            <h3 className="text-xl font-semibold text-center ">
+              Đăng nhập tài khoản
+            </h3>
             <button
               onClick={renderFlowbite}
               type="button"
@@ -125,10 +145,16 @@ export default function Signin({ onLoginSuccess }: SigninProps) {
           {/* sign in  */}
           <div className="p-4 md:p-5">
             <form
-              onSubmit={(e) => onSubmit(e, acount)}
+              id="form"
+              onSubmit={(e) => onSubmit(e, account)}
               className="space-y-4"
               action="#"
             >
+              {showError && (
+                <p className="text-red-500 items-cente animate__backInUp animate__animated transition-all">
+                  {error}
+                </p>
+              )}
               <div>
                 <label
                   htmlFor="taiKhoan"
@@ -140,7 +166,7 @@ export default function Signin({ onLoginSuccess }: SigninProps) {
                   onChange={handleOnchange}
                   type="email"
                   name="email"
-                  autoComplete="username"
+                  value={account.email}
                   className="bg-gray-50 border  rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:placeholder-gray-400 text-black"
                   placeholder="Nhập email"
                   required
@@ -155,7 +181,7 @@ export default function Signin({ onLoginSuccess }: SigninProps) {
                 </label>
                 <input
                   onChange={handleOnchange}
-                  autoComplete="current-password"
+                  value={account.password}
                   type="password"
                   name="password"
                   placeholder="••••••••"
@@ -191,9 +217,16 @@ export default function Signin({ onLoginSuccess }: SigninProps) {
               </div>
               <button
                 type="submit"
-                className="cursor-pointer text-white bg-pink-500 hover:bg-pink-600 focus:ring-4 focus:outline-none  focus:ring-pink-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center grid place-items-center w-full"
+                className={`cursor-pointer text-white bg-pink-500 hover:bg-pink-600 focus:ring-4 focus:outline-none  focus:ring-pink-300 font-medium rounded-lg text-sm sm:w-auto px-5 py-2.5 text-center grid place-items-center w-full
+                    ${
+                      loading
+                        ? "bg-pink-300 cursor-not-allowed"
+                        : "bg-pink-500 hover:bg-pink-600"
+                    }
+                  
+                  `}
               >
-                Đăng nhập
+                {loading ? "Đang đăng nhập" : "Đăng nhập"}
               </button>
               <div className="text-sm font-medium text-gray-500 dark:text-gray-300">
                 <a

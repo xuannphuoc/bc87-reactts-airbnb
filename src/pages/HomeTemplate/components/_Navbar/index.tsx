@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { type AppDispatch, type RootState } from "@/store/index";
 import { getDataLocation } from "../getAPI/navbar.ts";
-import Signup from "../Register/index.tsx";
+import Register from "../Register/index.tsx";
 import Signin from "../Login/index.tsx";
 import type { UserData } from "../_Type/type.tsx";
 import { Link } from "react-router-dom";
@@ -15,6 +15,7 @@ import { BookingContext } from "@/context/BookingContext";
 import Avatar from "./Avatar/avatar.tsx";
 import SearchBar from "./SearchBar/searchbar.tsx";
 import Login from "./Login/login.tsx";
+import MessageToast from "../Toast/toast.tsx";
 export default function Navbar() {
   const dispatch: AppDispatch = useDispatch();
   const [showSearch, setShowSearch] = useState(true);
@@ -22,6 +23,7 @@ export default function Navbar() {
   const [isMobile, setIsMobile] = useState(false);
   const [inputLocaton, setInputLocation] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const state = useSelector((state: RootState) => state.LocationSlice);
 
   const context = useContext(BookingContext);
@@ -53,7 +55,6 @@ export default function Navbar() {
   const user = useSelector((state: RootState) => state.getUserSlice.data);
   const isLogin = !!user;
 
-  console.log(user);
   //==================
   const gotoDetail = useGotoDetail();
   useEffect(() => {
@@ -116,6 +117,11 @@ export default function Navbar() {
         onClick={() => setShowSearch(true)}
         className="bg-[#FDFDFD] w-full  fixed top-0 start-0 border-b border-gray-200  "
       >
+        <MessageToast
+          show={showSuccess}
+          message={"Đăng nhập thành công"}
+          onClose={() => setShowSuccess(false)}
+        />
         <div>
           <div className="flex flex-wrap items-center justify-between px-4 py-2 max-w-screen-2xl mx-auto md:grid md:grid-cols-12">
             {/* Left - Logo */}
@@ -212,8 +218,13 @@ export default function Navbar() {
         </div>
       </nav>
 
-      <Signin onLoginSuccess={handleLogin} />
-      <Signup />
+      <Signin
+        onLoginSuccess={(user) => {
+          handleLogin(user);
+          setShowSuccess(true);
+        }}
+      />
+      <Register />
     </div>
   );
 }

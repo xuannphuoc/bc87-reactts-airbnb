@@ -12,6 +12,7 @@ interface Props {
   data: PostComment;
   setData: React.Dispatch<React.SetStateAction<PostComment>>;
   userData: any;
+  loading: boolean;
 }
 
 export default function CommentBlock({
@@ -19,6 +20,7 @@ export default function CommentBlock({
   data,
   setData,
   userData,
+  loading,
 }: Props) {
   const dispatch = useDispatch<AppDispatch>();
   const [visibleCount, setVisibleCount] = useState(3);
@@ -75,9 +77,9 @@ export default function CommentBlock({
             }
             dispatch(postComment(data));
           }}
-          className="text-white bg-pink-500 px-4 py-2 rounded-xl"
+          className="text-white bg-pink-500 cursor-pointer px-4 py-2 rounded-xl"
         >
-          Thêm bình luận
+          {loading ? "Đang thêm bình luận..." : "Thêm bình luận"}
         </button>
       </div>
     </>

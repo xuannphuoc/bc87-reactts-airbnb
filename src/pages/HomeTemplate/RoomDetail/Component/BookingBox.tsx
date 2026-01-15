@@ -12,9 +12,16 @@ interface Props {
   setForm: React.Dispatch<React.SetStateAction<FormBookRom>>;
   userData: any;
   istoday: string;
+  loading: boolean;
 }
 
-export default function BookingBox({ room, form, setForm, istoday }: Props) {
+export default function BookingBox({
+  room,
+  form,
+  setForm,
+  istoday,
+  loading,
+}: Props) {
   const dispatch = useDispatch<AppDispatch>();
   const context = useContext(BookingContext);
   if (!context) return null;
@@ -207,7 +214,7 @@ export default function BookingBox({ room, form, setForm, istoday }: Props) {
             type="button"
             className="w-full cursor-pointer text-white rounded-md bg-linear-to-r from-purple-500 to-pink-500 hover:opacity-95 focus:ring-4 focus:outline-none focus:ring-purple-200 font-medium text-sm px-4 py-2.5"
           >
-            Đặt phòng
+            {loading ? "Đang đặt phòng..." : "Đặt phòng"}
           </button>
         </div>
 

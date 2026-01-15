@@ -63,6 +63,11 @@ const bookRoomSlice = createSlice({
       state.data = null;
       state.error = null;
     },
+    resetBookRoom: (state) => {
+      state.loading = false,
+      state.data = null,
+      state.error = null
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(bookRoomReducer.pending, (state) => {
@@ -78,5 +83,5 @@ const bookRoomSlice = createSlice({
     });
   },
 });
-
+export const {resetBookRoom} = bookRoomSlice.actions
 export default bookRoomSlice.reducer;

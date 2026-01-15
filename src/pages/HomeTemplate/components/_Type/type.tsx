@@ -9,6 +9,10 @@ export interface UserData {
   gender: boolean;
   role: string;
 }
+export type UserRes = {
+  user: {},
+  token: string
+}
 export type Booking = {
   checkin?: string;
   checkout?: string;

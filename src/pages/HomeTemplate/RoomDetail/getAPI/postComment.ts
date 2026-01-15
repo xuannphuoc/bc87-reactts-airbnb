@@ -54,7 +54,13 @@ export const postComment = createAsyncThunk<any, PostComment>(
 const postCommentReducer = createSlice({
   name: "commentReducer",
   initialState,
-  reducers: {},
+  reducers: {
+    resetComment: (state) => {
+      state.loading = false,
+      state.data = null,
+      state.error = null
+    }
+  },
   extraReducers: (builder) => {
     builder.addCase(postComment.pending, (state) => {
       state.loading = true;
@@ -70,4 +76,5 @@ const postCommentReducer = createSlice({
   },
 });
 
+export const {resetComment} = postCommentReducer.actions
 export default postCommentReducer.reducer;
