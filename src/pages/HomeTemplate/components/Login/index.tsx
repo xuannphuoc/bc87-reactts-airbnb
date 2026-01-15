@@ -80,6 +80,16 @@ export default function Signin({ onLoginSuccess }: SigninProps) {
       const closeBtn = document.querySelector<HTMLButtonElement>(
         '#authentication-modal [data-modal-hide="authentication-modal"]'
       );
+
+      const loginModel = document.getElementById("authentication-modal");
+      loginModel?.classList.add("hidden");
+      loginModel?.setAttribute("aria-hidden", "true");
+
+      document
+        .querySelectorAll("[modal-backdrop]")
+        .forEach((el) => el.remove());
+      document.body.classList.remove("overflow-hidden");
+
       closeBtn?.click();
       distpatch(resetLogin());
     }
