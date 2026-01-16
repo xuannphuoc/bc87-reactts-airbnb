@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { getToken } from "../../components/helper/getToken";
 import type { AxiosError } from "axios";
 import axios from "axios";
 export interface PostComment {
@@ -21,12 +22,6 @@ const initialState: Stateslice = {
   error: null,
 };
 
-const userLogin =
-  localStorage.getItem("userLogin") ??
-  sessionStorage.getItem("userLogin");
-
-const token = userLogin ? JSON.parse(userLogin).token : null;
-
 
 export const postComment = createAsyncThunk<any, PostComment>(
   "postCommentReducer",
@@ -37,7 +32,7 @@ export const postComment = createAsyncThunk<any, PostComment>(
         method: "POST",
         data,
         headers: {
-          token: token,
+          token: getToken(),
           tokenCybersoft:
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCA4NyIsIkhldEhhblN0cmluZyI6IjIzLzAzLzIwMjYiLCJIZXRIYW5UaW1lIjoiMTc3NDIyNDAwMDAwMCIsIm5iZiI6MTc0NzI0MjAwMCwiZXhwIjoxNzc0MzcxNjAwfQ.-W4bvmZuRBJxryMtPHaMnmm11rdGxNTYol7fLRQid1g",
         },
