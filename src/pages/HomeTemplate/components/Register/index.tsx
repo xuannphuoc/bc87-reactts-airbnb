@@ -25,7 +25,7 @@ const registerSchema = z.object({
       /^(0?[1-9]|[12][0-9]|3[01])[\/](0?[1-9]|1[0-2])[\/]\d{4}$/,
       "Ngày sinh dd/mm/yyyy"
     ),
-  gender: z.enum(["Nam", "Nữ"], {
+  gender: z.enum(["Nam", "Nu"], {
     message: "Vui lòng chọn giới tính",
   }),
 });
@@ -52,7 +52,7 @@ export default function Register() {
   const onSubmit = (formData: any) => {
     const payload: Account = {
       ...formData,
-      gender: formData.gender === "Nam",
+      gender: formData.gender === "Nam" ? true : false,
       role: "USER",
     };
 

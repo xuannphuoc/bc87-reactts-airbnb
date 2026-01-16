@@ -20,15 +20,13 @@ const initialState: Stateslice = {
   loading: false,
   error: null,
 };
-let token = null;
-const localData = localStorage.getItem("userLogin");
-const sessionData = sessionStorage.getItem("userLogin");
 
-if (localData) {
-  token = JSON.parse(localData).token;
-} else if (sessionData) {
-  token = JSON.parse(sessionData).token;
-}
+const userLogin =
+  localStorage.getItem("userLogin") ??
+  sessionStorage.getItem("userLogin");
+
+const token = userLogin ? JSON.parse(userLogin).token : null;
+
 
 export const postComment = createAsyncThunk<any, PostComment>(
   "postCommentReducer",
