@@ -335,9 +335,9 @@ export default function ManageLocation() {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                <thead className="text-xs text-gray-100 dark:text-gray-600 uppercase bg-gray-700 dark:bg-gray-100">
+            <div className="overflow-x-auto  overflow-y-auto lg:h-[50vh] xl:h-[65vh]">
+              <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 ">
+                <thead className="text-xs text-gray-100 dark:text-gray-600 uppercase bg-gray-700 dark:bg-gray-100 sticky top-0">
                   <tr>
                     <th className="px-6 py-3">ID</th>
                     <th className="px-6 py-3">Hình ảnh</th>

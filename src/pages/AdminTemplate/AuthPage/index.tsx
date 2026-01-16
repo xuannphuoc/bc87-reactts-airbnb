@@ -21,7 +21,7 @@ export default function AuthPage() {
 
   if (data) {
     console.log(data);
-    return <Navigate to={"/admin/dashboard"} />;
+    return <Navigate to={"/admin"} />;
   }
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {

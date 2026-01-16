@@ -9,7 +9,7 @@ import {
 
 export default function DashboardPage() {
   return (
-    <div className="p-6 space-y-6 max-w-6xl mx-auto w-full">
+    <div className="p-6 space-y-6 max-w-6xl mx-auto w-full h-screen overflow-y-auto">
       <h1 className="text-3xl font-bold text-black text-center">
         Dashboard Overview
       </h1>

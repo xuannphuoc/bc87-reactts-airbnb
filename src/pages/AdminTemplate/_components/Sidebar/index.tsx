@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
 const menu = [
-  { title: "Dashboard", path: "/admin/dashboard" },
+  { title: "Dashboard", path: "/admin" },
   { title: "Users", path: "/admin/user" },
   { title: "Locations", path: "/admin/location" },
   { title: "Rooms", path: "/admin/room" },

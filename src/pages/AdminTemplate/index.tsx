@@ -12,11 +12,11 @@ export default function AdminTemplate() {
   }
 
   return (
-    <div style={{ display: "flex" }}>
+    <div className="flex h-screen overflow-hidden">
       <Sidebar />
-      <div style={{ flex: 1 }}>
+      <div className="flex flex-col flex-1 overflow-hidden">
         <Topbar />
-        <div style={{ padding: 20 }}>
+        <div className="flex-1 overflow-y-auto p-5">
           <Outlet />
         </div>
       </div>

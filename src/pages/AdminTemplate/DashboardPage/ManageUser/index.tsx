@@ -339,7 +339,7 @@ export default function ManageUser() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="h-screen overflow-hidden bg-gray-50 p-4">
       <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-lg shadow mb-6 p-6">
           <div className="flex items-center justify-between flex-wrap gap-4">
@@ -423,9 +423,9 @@ export default function ManageUser() {
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left text-gray-500">
-                  <thead className="text-xs text-gray-500 uppercase bg-gray-50">
+              <div className="overflow-x-auto overflow-y-auto lg:h-[50vh] xl:h-[65vh] ">
+                <table className="w-full text-sm text-left text-gray-500 ">
+                  <thead className="text-xs text-gray-500 uppercase bg-gray-50 sticky top-0">
                     <tr>
                       <th className="px-6 py-3 ">ID</th>
                       <th className="px-6 py-3">Họ tên</th>

@@ -358,9 +358,9 @@ export default function ManageBooking() {
               <p className="mt-2 text-gray-600">Đang tải...</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto overflow-y-auto lg:h-[50vh] xl:h-[65vh]">
               <table className="w-full text-sm text-left text-gray-500">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
                   <tr>
                     <th className="px-6 py-3">ID</th>
                     <th className="px-6 py-3">Mã phòng</th>

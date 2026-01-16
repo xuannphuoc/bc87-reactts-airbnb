@@ -457,9 +457,9 @@ export default function ManageRoom() {
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto overflow-y-auto lg:h-[50vh] xl:h-[65vh] ">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gray-50 border-b border-gray-200 sticky top-0">
                   <tr>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       ID
