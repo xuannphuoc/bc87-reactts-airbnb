@@ -17,12 +17,14 @@ export interface Comments {
 
 interface StateLisce {
   data: Comments[];
+  roomId: number | null;
   loading: boolean;
   error: null | AxiosError;
 }
 
 const initialState: StateLisce = {
   data: [],
+  roomId: null,
   loading: false,
   error: null,
 };
@@ -50,14 +52,19 @@ const commentSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(getComment.pending, (state) => {
+    builder.addCase(getComment.pending, (state, action) => {
       state.loading = true;
+      if (state.roomId !== action.meta.arg) state.data = [];
+      state.roomId = action.meta.arg;
+      state.error = null;
     });
     builder.addCase(getComment.fulfilled, (state, action) => {
+      if (state.roomId !== action.meta.arg) return;
       state.loading = false;
       state.data = action.payload;
     });
     builder.addCase(getComment.rejected, (state, action) => {
+      if (action.meta.aborted || state.roomId !== action.meta.arg) return;
       state.loading = false;
       state.error = action.payload as AxiosError;
     });

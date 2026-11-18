@@ -20,7 +20,6 @@ export default function AuthPage() {
   });
 
   if (data) {
-    console.log(data);
     return <Navigate to={"/admin"} />;
   }
 

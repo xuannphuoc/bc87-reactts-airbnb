@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { putAvatar } from "./../getAPI/uploadAvatar.ts";
 type Props = {
-  currentUser: UserData;
+  currentUser: Pick<UserData, "id" | "avatar" | "name" | "email">;
 };
 export default function UserPicture({ currentUser }: Props) {
   const dispatch = useDispatch<AppDispatch>();

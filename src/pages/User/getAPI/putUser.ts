@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-import axios from "axios";
+import api from "@/services/apiServices";
 
 export interface PutUser {
   id: number;
@@ -31,17 +31,11 @@ export const putUserReducer = createAsyncThunk<
   { rejectValue: string }
 >("putUserReducer", async (formUser, { rejectWithValue }) => {
   try {
-    const response = await axios.put(
-      `https://airbnbnew.cybersoft.edu.vn/api/users/${formUser.id}`,
-      formUser,
-      {
-        headers: {
-          tokenCybersoft:
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCA4NyIsIkhldEhhblN0cmluZyI6IjI3LzAzLzIwMjYiLCJIZXRIYW5UaW1lIjoiMTc3NDU2OTYwMDAwMCIsIm5iZiI6MTc0NzI0MjAwMCwiZXhwIjoxNzc0NzE3MjAwfQ.YJSCMUqM4JgIqsDiGq9fxRp3AOrIdxBO4t7xxj6K8dY",
-        },
-      }
+    const response = await api.put(
+      `users/${formUser.id}`,
+      formUser
     );
-    return response.data;
+    return response.data.content;
   } catch (err: any) {
     return rejectWithValue(err.response?.data?.message || "Cập nhật thất bại");
   }

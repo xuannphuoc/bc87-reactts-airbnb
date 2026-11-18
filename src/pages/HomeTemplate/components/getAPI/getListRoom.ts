@@ -4,7 +4,7 @@ import {
   type PayloadAction,
 } from "@reduxjs/toolkit";
 import type { AxiosError } from "axios";
-import axios from "axios";
+import api from "@/services/apiServices";
 import type { DetailRoom } from "../_Type/type";
 
 export type StateRoom = {
@@ -27,13 +27,9 @@ export const getListDataRoom = createAsyncThunk<
   }
 >("list/getListDataRoom", async (id, { rejectWithValue }) => {
   try {
-    const response = await axios({
-      url: `https://airbnbnew.cybersoft.edu.vn/api/phong-thue/lay-phong-theo-vi-tri?maViTri=${id}`,
+    const response = await api({
+      url: `phong-thue/lay-phong-theo-vi-tri?maViTri=${id}`,
       method: "GET",
-      headers: {
-        tokenCybersoft:
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCA4NyIsIkhldEhhblN0cmluZyI6IjIzLzAzLzIwMjYiLCJIZXRIYW5UaW1lIjoiMTc3NDIyNDAwMDAwMCIsIm5iZiI6MTc0NzI0MjAwMCwiZXhwIjoxNzc0MzcxNjAwfQ.-W4bvmZuRBJxryMtPHaMnmm11rdGxNTYol7fLRQid1g",
-      },
     });
 
     return response.data.content;
@@ -54,12 +50,15 @@ const listDataRoomSlice = createSlice({
     builder
       .addCase(getListDataRoom.pending, (state) => {
         state.loading = true;
+      state.data = [];
+      state.error = null;
       })
       .addCase(getListDataRoom.fulfilled, (state, action) => {
         state.loading = false;
         state.data = action.payload;
       })
       .addCase(getListDataRoom.rejected, (state, action) => {
+      if (action.meta.aborted) return;
         state.loading = false;
         state.error = action.payload ?? null;
       });

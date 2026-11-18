@@ -24,7 +24,7 @@ export const getLocalId = createAsyncThunk(
   async (id: number, { rejectWithValue }) => {
     try {
       const response = await api.get(
-        `https://airbnbnew.cybersoft.edu.vn/api/vi-tri/${id}`
+        `vi-tri/${id}`
       );
       return response.data.content;
     } catch (error) {

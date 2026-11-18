@@ -153,7 +153,7 @@ export default function ManageLocation() {
     if (!formData.hinhAnh.trim()) {
       newErrors.hinhAnh = "URL hình ảnh là bắt buộc";
     } else if (
-      !/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(formData.hinhAnh)
+      !(/^(https?:\/\/|data:image\/)/i.test(formData.hinhAnh) || formData.hinhAnh.startsWith(import.meta.env.BASE_URL + "images/"))
     ) {
       newErrors.hinhAnh = "URL hình ảnh không hợp lệ";
     }

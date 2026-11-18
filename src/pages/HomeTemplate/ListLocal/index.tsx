@@ -1,10 +1,17 @@
-import { useSelector } from "react-redux";
-import { type RootState } from "../../../store";
-import Room from "./room/room";
+import { useEffect } from "react";
+import { getListDataRoom } from "../components/getAPI/getListRoom";
+import { useDispatch, useSelector } from "react-redux";
+import { type AppDispatch, type RootState } from "../../../store";
+import RoomCard from "@/components/RoomCard";
 import { useParams } from "react-router-dom";
 
 export default function DetailRoomPage() {
-  const { location } = useParams();
+  const { id, location } = useParams();
+  const dispatch = useDispatch<AppDispatch>();
+  useEffect(() => {
+    const request = dispatch(getListDataRoom(Number(id)));
+    return () => request.abort();
+  }, [dispatch, id]);
   const { data, loading } = useSelector(
     (state: RootState) => state.listDataRoomSlice
   );
@@ -55,7 +62,7 @@ export default function DetailRoomPage() {
             {Array.isArray(data) && data.length > 0 ? (
               <div className="grid grid-cols-1 mt-6">
                 {data.map((room) => {
-                  return <Room key={room.id} room={room} />;
+                  return <RoomCard key={room.id} room={room} />;
                 })}
               </div>
             ) : (

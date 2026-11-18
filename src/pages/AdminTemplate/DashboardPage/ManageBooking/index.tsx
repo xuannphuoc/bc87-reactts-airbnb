@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ChangeEvent, type ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../../../store";
 import {
@@ -19,7 +19,7 @@ interface FormData {
   maNguoiDung: number;
 }
 
-const Modal = ({ title, children, onClose }: any) => (
+const Modal = ({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) => (
   <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-50">
     <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
       <div className="flex items-center justify-between p-4 border-b ">
@@ -49,13 +49,24 @@ const FormInput = ({
   value,
   onChange,
   error,
-}: any) => (
+}: {
+  label: string;
+  name: keyof FormData;
+  type?: "text" | "number" | "date";
+  required?: boolean;
+  placeholder?: string;
+  min?: string;
+  value: string | number;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  error?: string;
+}) => (
   <div>
-    <label className="block mb-2 text-sm font-medium text-gray-900">
+    <label htmlFor={name} className="block mb-2 text-sm font-medium text-gray-900">
       {label} {required && <span className="text-red-600">*</span>}
     </label>
     <input
       type={type}
+      id={name}
       name={name}
       min={min}
       value={value || ""}
@@ -201,6 +212,12 @@ export default function ManageBooking() {
     }
   };
 
+  const closeBookingForm = () => {
+    setShowAddModal(false);
+    setShowEditModal(false);
+    resetForm();
+  };
+
   const openAddModal = () => {
     resetForm();
     setShowAddModal(true);
@@ -215,6 +232,7 @@ export default function ManageBooking() {
       soLuongKhach: booking.soLuongKhach,
       maNguoiDung: booking.maNguoiDung,
     });
+    setFormErrors({});
     setShowEditModal(true);
   };
 
@@ -558,10 +576,10 @@ export default function ManageBooking() {
           </div>
         )}
 
-        {showAddModal && (
+        {(showAddModal || (showEditModal && selectedBooking)) && (
           <Modal
-            title="Thêm đặt phòng mới"
-            onClose={() => setShowAddModal(false)}
+            title={showEditModal ? "Chỉnh sửa đặt phòng" : "Thêm đặt phòng mới"}
+            onClose={closeBookingForm}
           >
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -573,7 +591,7 @@ export default function ManageBooking() {
                   placeholder="Nhập mã phòng"
                   min="1"
                   value={formData.maPhong}
-                  onChange={(e: any) => {
+                  onChange={(e) => {
                     const value =
                       e.target.value === "" ? 0 : parseInt(e.target.value) || 0;
                     setFormData((prev) => ({ ...prev, maPhong: value }));
@@ -590,7 +608,7 @@ export default function ManageBooking() {
                   placeholder="Nhập mã người dùng"
                   min="1"
                   value={formData.maNguoiDung}
-                  onChange={(e: any) => {
+                  onChange={(e) => {
                     const value =
                       e.target.value === "" ? 0 : parseInt(e.target.value) || 0;
                     setFormData((prev) => ({ ...prev, maNguoiDung: value }));
@@ -605,7 +623,7 @@ export default function ManageBooking() {
                   type="date"
                   required
                   value={formData.ngayDen}
-                  onChange={(e: any) => {
+                  onChange={(e) => {
                     setFormData((prev) => ({
                       ...prev,
                       ngayDen: e.target.value,
@@ -621,7 +639,7 @@ export default function ManageBooking() {
                   type="date"
                   required
                   value={formData.ngayDi}
-                  onChange={(e: any) => {
+                  onChange={(e) => {
                     setFormData((prev) => ({
                       ...prev,
                       ngayDi: e.target.value,
@@ -639,7 +657,7 @@ export default function ManageBooking() {
                   placeholder="Nhập số lượng khách"
                   min="1"
                   value={formData.soLuongKhach}
-                  onChange={(e: any) => {
+                  onChange={(e) => {
                     const value =
                       e.target.value === "" ? 1 : parseInt(e.target.value) || 1;
                     setFormData((prev) => ({ ...prev, soLuongKhach: value }));
@@ -652,125 +670,17 @@ export default function ManageBooking() {
             </div>
             <div className="flex items-center justify-end gap-3 p-4 border-t">
               <button
-                onClick={() => setShowAddModal(false)}
+                onClick={closeBookingForm}
                 className="text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5"
               >
                 Hủy
               </button>
               <button
-                onClick={handleAddBooking}
+                onClick={showEditModal ? handleEditBooking : handleAddBooking}
+                disabled={loading}
                 className="text-white bg-rose-600 hover:bg-rose-700 font-medium rounded-lg text-sm px-5 py-2.5"
               >
-                Thêm đặt phòng
-              </button>
-            </div>
-          </Modal>
-        )}
-
-        {showEditModal && selectedBooking && (
-          <Modal
-            title="Chỉnh sửa đặt phòng"
-            onClose={() => setShowEditModal(false)}
-          >
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormInput
-                  label="Mã phòng"
-                  name="maPhong"
-                  type="number"
-                  required
-                  placeholder="Nhập mã phòng"
-                  min="1"
-                  value={formData.maPhong}
-                  onChange={(e: any) => {
-                    const value =
-                      e.target.value === "" ? 0 : parseInt(e.target.value) || 0;
-                    setFormData((prev) => ({ ...prev, maPhong: value }));
-                    if (formErrors.maPhong)
-                      setFormErrors((prev) => ({ ...prev, maPhong: "" }));
-                  }}
-                  error={formErrors.maPhong}
-                />
-                <FormInput
-                  label="Mã người dùng"
-                  name="maNguoiDung"
-                  type="number"
-                  required
-                  placeholder="Nhập mã người dùng"
-                  min="1"
-                  value={formData.maNguoiDung}
-                  onChange={(e: any) => {
-                    const value =
-                      e.target.value === "" ? 0 : parseInt(e.target.value) || 0;
-                    setFormData((prev) => ({ ...prev, maNguoiDung: value }));
-                    if (formErrors.maNguoiDung)
-                      setFormErrors((prev) => ({ ...prev, maNguoiDung: "" }));
-                  }}
-                  error={formErrors.maNguoiDung}
-                />
-                <FormInput
-                  label="Ngày đến"
-                  name="ngayDen"
-                  type="date"
-                  required
-                  value={formData.ngayDen}
-                  onChange={(e: any) => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      ngayDen: e.target.value,
-                    }));
-                    if (formErrors.ngayDen)
-                      setFormErrors((prev) => ({ ...prev, ngayDen: "" }));
-                  }}
-                  error={formErrors.ngayDen}
-                />
-                <FormInput
-                  label="Ngày đi"
-                  name="ngayDi"
-                  type="date"
-                  required
-                  value={formData.ngayDi}
-                  onChange={(e: any) => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      ngayDi: e.target.value,
-                    }));
-                    if (formErrors.ngayDi)
-                      setFormErrors((prev) => ({ ...prev, ngayDi: "" }));
-                  }}
-                  error={formErrors.ngayDi}
-                />
-                <FormInput
-                  label="Số lượng khách"
-                  name="soLuongKhach"
-                  type="number"
-                  required
-                  placeholder="Nhập số lượng khách"
-                  min="1"
-                  value={formData.soLuongKhach}
-                  onChange={(e: any) => {
-                    const value =
-                      e.target.value === "" ? 1 : parseInt(e.target.value) || 1;
-                    setFormData((prev) => ({ ...prev, soLuongKhach: value }));
-                    if (formErrors.soLuongKhach)
-                      setFormErrors((prev) => ({ ...prev, soLuongKhach: "" }));
-                  }}
-                  error={formErrors.soLuongKhach}
-                />
-              </div>
-            </div>
-            <div className="flex items-center justify-end gap-3 p-4 border-t">
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={handleEditBooking}
-                className="text-white bg-rose-600 hover:bg-rose-700 font-medium rounded-lg text-sm px-5 py-2.5"
-              >
-                Cập nhật
+                {showEditModal ? "Cập nhật" : "Thêm đặt phòng"}
               </button>
             </div>
           </Modal>

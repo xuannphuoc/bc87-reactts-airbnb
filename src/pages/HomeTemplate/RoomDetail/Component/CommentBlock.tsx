@@ -1,4 +1,3 @@
-import { Modal } from "flowbite";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/store";
@@ -7,23 +6,48 @@ import Comment from "./Comment/comment";
 import StarRating from "./Rate/Rating";
 import { postComment } from "../getAPI/postComment";
 import type { PostComment } from "../getAPI/postComment.ts";
-interface Props {
-  comment: Comments[];
-  data: PostComment;
-  setData: React.Dispatch<React.SetStateAction<PostComment>>;
-  userData: any;
-  loading: boolean;
-}
+import { getComment } from "../../ListLocal/getAPI/getComment";
+import { readDemoSession } from "@/services/demoSession";
+import { toast } from "react-hot-toast";
 
-export default function CommentBlock({
-  comment,
-  data,
-  setData,
-  userData,
-  loading,
-}: Props) {
+export default function CommentBlock({ comment, roomId }: { comment: Comments[]; roomId: number }) {
   const dispatch = useDispatch<AppDispatch>();
   const [visibleCount, setVisibleCount] = useState(3);
+  const [content, setContent] = useState("");
+  const [rating, setRating] = useState(0);
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit() {
+    const user = readDemoSession()?.user;
+    if (!user) {
+      toast.error("Bạn cần đăng nhập để tiếp tục.");
+      document.getElementById("open-login-modal")?.click();
+      return;
+    }
+    if (!content.trim() || !rating) {
+      toast.error("Vui lòng nhập nội dung và chọn số sao.");
+      return;
+    }
+    setLoading(true);
+    const newComment: PostComment = {
+      maPhong: roomId,
+      maNguoiBinhLuan: user.id,
+      ngayBinhLuan: new Date().toISOString(),
+      noiDung: content.trim(),
+      saoBinhLuan: rating,
+    };
+    try {
+      await dispatch(postComment(newComment)).unwrap();
+      setContent("");
+      setRating(0);
+      toast.success("Đã thêm bình luận");
+      await dispatch(getComment(roomId));
+    } catch {
+      toast.error("Thêm bình luận thất bại");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <>
@@ -33,7 +57,7 @@ export default function CommentBlock({
         ))}
       </div>
 
-      <button
+      {comment.length > 3 && <button
         type="button"
         onClick={() =>
           visibleCount < comment.length
@@ -45,38 +69,24 @@ export default function CommentBlock({
         {visibleCount < comment.length
           ? "Hiển thị tất cả các bình luận"
           : "Thu gọn "}
-      </button>
+      </button>}
 
       <p className="text-2xl mb-2 font-medium"> Bình luận của bạn</p>
 
       <div className="flex gap-6 items-center">
         <textarea
-          value={data.noiDung}
-          onChange={(e) =>
-            setData((prev) => ({ ...prev, noiDung: e.target.value }))
-          }
+          aria-label="Nội dung bình luận"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
           className="w-full sm:w-[400px] lg:w-[600px] h-[150px] rounded-2xl p-3 border"
         />
 
-        <StarRating
-          onChangeRating={(value) =>
-            setData((prev) => ({ ...prev, saoBinhLuan: value }))
-          }
-        />
+        <StarRating rating={rating} onChangeRating={setRating} />
 
         <button
-          onClick={() => {
-            if (!userData) {
-              alert("Bạn cần đăng nhập để tiếp tục!");
-              const modalEl = document.getElementById("authentication-modal");
-              if (modalEl) {
-                const modal = new Modal(modalEl);
-                modal.show();
-              }
-              return;
-            }
-            dispatch(postComment(data));
-          }}
+          type="button"
+          onClick={handleSubmit}
+          disabled={loading}
           className="text-white bg-pink-500 cursor-pointer px-4 py-2 rounded-xl"
         >
           {loading ? "Đang thêm bình luận..." : "Thêm bình luận"}

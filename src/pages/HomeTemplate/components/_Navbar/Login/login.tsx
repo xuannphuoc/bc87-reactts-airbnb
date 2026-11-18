@@ -5,6 +5,7 @@ export default function Login({ login }: { login: boolean }) {
       {!login && (
         <div className="relative">
           <button
+            aria-label="Tùy chọn tài khoản"
             id="dropdownHoverButton"
             data-dropdown-toggle="dropdownHover"
             className="w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center hover:bg-gray-100 transition"
@@ -19,8 +20,7 @@ export default function Login({ login }: { login: boolean }) {
             <ul className="py-2 text-sm text-gray-700 font-medium">
               <li>
                 <button
-                  data-modal-target="authentication-modal"
-                  data-modal-toggle="authentication-modal"
+                  data-modal-show="authentication-modal"
                   className="block text-blue-400 w-full text-left px-4 py-2 hover:bg-gray-100"
                 >
                   <i className="fa-solid fa-arrow-left" />

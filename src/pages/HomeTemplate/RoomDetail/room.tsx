@@ -1,145 +1,33 @@
 import { useDispatch, useSelector } from "react-redux";
-import { type AppDispatch, type RootState } from "../../../store";
-import { useState, useEffect, useContext } from "react";
-import { resetComment, type PostComment } from "./getAPI/postComment";
+import { type AppDispatch, type RootState } from "@/store";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { resetBookRoom, type FormBookRom } from "./getAPI/bookRoom";
-import { initFlowbite } from "flowbite";
-import { BookingContext } from "../../../context/BookingContext";
+import { getDetailRoom } from "../ListLocal/getAPI/getDetailRoom";
+import { getComment } from "../ListLocal/getAPI/getComment";
 import BookingBox from "./Component/BookingBox";
 import CommentBlock from "./Component/CommentBlock";
-import { toast } from "react-hot-toast";
+
 export default function Room() {
-  const istoday = new Date().toISOString().split("T")[0];
-
-  const context = useContext(BookingContext);
-  if (!context) return null;
-  const { booking, setBooking } = context;
-
+  const { id } = useParams();
+  const roomId = Number(id);
   const dispatch = useDispatch<AppDispatch>();
-
-  const roomData = useSelector((state: RootState) => state.detailRoomSlice);
-  const comment = useSelector((state: RootState) => state.commentSlice.data);
-  const postCommentState = useSelector(
-    (state: RootState) => state.postCommentReducer
-  );
-  const bookRoomState = useSelector((state: RootState) => state.bookRoomSlice);
-
-  const { id: maPhong } = useParams();
-
-  const userString =
-    localStorage.getItem("userLogin") || sessionStorage.getItem("userLogin");
-  const parsed = userString ? JSON.parse(userString) : null;
-  const userData = parsed?.user;
-
-  let room = null;
-  if (roomData.data) {
-    room = roomData.data;
-  } else {
-    const stored = sessionStorage.getItem("dataRoom");
-    if (stored) room = JSON.parse(stored);
-  }
+  const { data, loading } = useSelector((state: RootState) => state.detailRoomSlice);
+  const { data: comments, roomId: commentsRoomId } = useSelector((state: RootState) => state.commentSlice);
 
   useEffect(() => {
-    if (roomData.data && comment?.length > 0) {
-      sessionStorage.setItem("dataRoom", JSON.stringify(roomData.data));
-      sessionStorage.setItem("dataComment", JSON.stringify(comment));
-    }
-  }, [roomData.data, comment]);
+    if (!Number.isInteger(roomId) || roomId < 1) return;
+    const roomRequest = dispatch(getDetailRoom(roomId));
+    const commentRequest = dispatch(getComment(roomId));
+    return () => {
+      roomRequest.abort();
+      commentRequest.abort();
+    };
+  }, [dispatch, roomId]);
 
-  useEffect(() => {
-    if (
-      (!comment || comment.length === 0) &&
-      sessionStorage.getItem("dataComment")
-    ) {
-      dispatch({
-        type: "commentSlice/setComment",
-        payload: JSON.parse(sessionStorage.getItem("dataComment")!),
-      });
-    }
-  }, []);
+  const room = data?.id === roomId ? data : null;
+  if (loading) return <p className="my-10 text-center">Đang tải phòng...</p>;
+  if (!room) return <p className="my-10 text-center">Không tìm thấy phòng.</p>;
 
-  const [form, setForm] = useState<FormBookRom>({
-    maPhong: Number(maPhong),
-    ngayDen: booking.checkin,
-    ngayDi: booking.checkout,
-    soLuongKhach: booking.guests,
-    maNguoiDung: userData?.id ?? 0,
-  });
-
-  const today = new Date();
-  const formattedDate = `${today.getFullYear()}-${String(
-    today.getMonth() + 1
-  ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}T00:00:00`;
-
-  const [data, setData] = useState<PostComment>({
-    maPhong: Number(maPhong),
-    maNguoiBinhLuan: userData?.id,
-    ngayBinhLuan: formattedDate,
-    noiDung: "",
-    saoBinhLuan: 0,
-  });
-
-  useEffect(() => {
-    if (postCommentState?.data) {
-      dispatch({
-        type: "commentSlice/addComment",
-        payload: postCommentState.data,
-      });
-
-      setData((prev) => ({
-        ...prev,
-        noiDung: "",
-        saoBinhLuan: 0,
-      }));
-    }
-  }, [postCommentState?.data]);
-
-  useEffect(() => {
-    if (bookRoomState.data) {
-      setForm({
-        maPhong: Number(maPhong),
-        ngayDen: istoday + "T00:00:00",
-        ngayDi: istoday + "T00:00:00",
-        soLuongKhach: 1,
-        maNguoiDung: userData?.id ?? 0,
-      });
-
-      setBooking({
-        checkin: istoday + "T00:00:00",
-        checkout: istoday + "T00:00:00",
-        guests: 1,
-      });
-
-      dispatch({ type: "bookRoomSlice/reset" });
-    }
-  }, [bookRoomState.data]);
-
-  useEffect(() => {
-    initFlowbite();
-  }, []);
-  // alert booking
-  useEffect(() => {
-    if (bookRoomState.data) {
-      toast.success("Đặt phòng thành công");
-      dispatch(resetBookRoom());
-    }
-    if (bookRoomState.error) {
-      toast.error("Đăt phòng thất bại");
-      dispatch(resetBookRoom());
-    }
-  });
-  // alert Comment
-  useEffect(() => {
-    if (postCommentState.data) {
-      toast.success("Bạn đã comment");
-      dispatch(resetComment());
-    }
-    if (postCommentState.error) {
-      toast.error("");
-      dispatch(resetComment());
-    }
-  });
   return (
     <div className="container mx-auto my-10 p-5">
       {room && (
@@ -373,22 +261,9 @@ export default function Room() {
                 </div>
               </div>
             </div>
-            <BookingBox
-              loading={bookRoomState.loading}
-              room={room}
-              form={form}
-              setForm={setForm}
-              userData={userData}
-              istoday={istoday}
-            />
+            <BookingBox room={room} />
           </div>
-          <CommentBlock
-            loading={postCommentState.loading}
-            comment={comment}
-            data={data}
-            setData={setData}
-            userData={userData}
-          />
+          <CommentBlock key={roomId} roomId={roomId} comment={commentsRoomId === roomId ? comments : []} />
         </>
       )}
     </div>

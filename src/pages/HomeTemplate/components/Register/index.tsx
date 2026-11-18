@@ -65,27 +65,13 @@ export default function Register() {
     if (data) {
       toast.success("Đăng ký thành công, mời bạn đăng nhập! 🎉");
 
-      const registerModal = document.getElementById("crypto-modal");
-      registerModal?.classList.add("hidden");
-      registerModal?.setAttribute("aria-hidden", "true");
-
-      document
-        .querySelectorAll("[modal-backdrop]")
-        .forEach((el) => el.remove());
-
-      document.body.classList.remove("overflow-hidden");
-
-      setTimeout(() => {
-        const loginBtn = document.querySelector<HTMLButtonElement>(
-          '[data-modal-target="authentication-modal"]'
-        );
-        loginBtn?.click();
-      }, 200);
+      document.getElementById("close-register-modal")?.click();
+      document.getElementById("open-login-modal")?.click();
       dispatch(resetAuthState());
     }
 
     if (error) {
-      toast.error("Đăng ký thất bại, vui lòng thử lại! ❌");
+      toast.error(error);
       dispatch(resetAuthState());
     }
   }, [data, error]);
@@ -97,6 +83,7 @@ export default function Register() {
       id="crypto-modal"
       className="hidden fixed inset-0 z-50 flex justify-center pt-24"
     >
+      <button type="button" id="close-register-modal" data-modal-hide="crypto-modal" hidden />
       <div className="w-full max-w-md bg-white rounded-xl shadow-xl p-6">
         <h3 className="text-xl font-semibold text-center mb-6">
           {loading ? "Đang đăng ký..." : "Đăng ký tài khoản"}

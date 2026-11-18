@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { AxiosError } from "axios";
-import axios from "axios";
+import api from "@/services/apiServices";
 export type Account = {
   // id: number;
   name: string;
@@ -15,7 +15,7 @@ export type Account = {
 export type StateInitial = {
   data: null | Account;
   loading: boolean;
-  error: null | AxiosError;
+  error: string | null;
 };
 
 const initialState: StateInitial = {
@@ -28,18 +28,15 @@ export const SignUp = createAsyncThunk(
   "SignUp",
   async (account: Account, { rejectWithValue }) => {
     try {
-      const response = await axios({
-        url: "https://airbnbnew.cybersoft.edu.vn/api/auth/signup",
+      const response = await api({
+        url: "auth/signup",
         method: "POST",
         data: account,
-        headers: {
-          tokenCybersoft:
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCA4NyIsIkhldEhhblN0cmluZyI6IjIzLzAzLzIwMjYiLCJIZXRIYW5UaW1lIjoiMTc3NDIyNDAwMDAwMCIsIm5iZiI6MTc0NzI0MjAwMCwiZXhwIjoxNzc0MzcxNjAwfQ.-W4bvmZuRBJxryMtPHaMnmm11rdGxNTYol7fLRQid1g",
-        },
       });
       return response.data.content;
     } catch (error) {
-      return console.log(rejectWithValue(error));
+      const failure = error as AxiosError<{ message?: string }>;
+      return rejectWithValue(failure.response?.data?.message ?? "Đăng ký thất bại.");
     }
   }
 );
@@ -57,7 +54,7 @@ const SignUpReducer = createSlice({
   extraReducers: (builder) => {
     builder.addCase(SignUp.pending, (state) => {
       state.loading = true;
-    
+      state.error = null;
     });
     builder.addCase(SignUp.fulfilled, (state, action) => {
       state.loading = false;
@@ -65,7 +62,7 @@ const SignUpReducer = createSlice({
     });
     builder.addCase(SignUp.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.payload as AxiosError;
+      state.error = action.payload as string;
     });
   },
 });

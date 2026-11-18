@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { AxiosError } from "axios";
 
-import axios from "axios";
+import api from "@/services/apiServices";
 
 export interface RoomByUser {
   id: number;
@@ -29,14 +29,8 @@ export const getRoomByUser = createAsyncThunk<RoomByUser[], number>(
   "user/getRoomByUser",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `https://airbnbnew.cybersoft.edu.vn/api/dat-phong/lay-theo-nguoi-dung/${id}`,
-        {
-          headers: {
-            tokenCybersoft:
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCA4NyIsIkhldEhhblN0cmluZyI6IjIzLzAzLzIwMjYiLCJIZXRIYW5UaW1lIjoiMTc3NDIyNDAwMDAwMCIsIm5iZiI6MTc0NzI0MjAwMCwiZXhwIjoxNzc0MzcxNjAwfQ.-W4bvmZuRBJxryMtPHaMnmm11rdGxNTYol7fLRQid1g",
-          },
-        }
+      const response = await api.get(
+        `dat-phong/lay-theo-nguoi-dung/${id}`
       );
       return response.data.content;
     } catch (error: any) {

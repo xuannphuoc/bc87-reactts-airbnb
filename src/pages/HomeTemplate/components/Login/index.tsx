@@ -3,10 +3,9 @@ import { type AppDispatch, type RootState } from "../../../../store/index";
 import { useDispatch, useSelector } from "react-redux";
 import { Login } from "./login.ts";
 import { initFlowbite } from "flowbite";
-import type { UserData } from "../_Type/type.tsx";
 import { resetLogin } from "./login.ts";
 interface SigninProps {
-  onLoginSuccess: (user: UserData) => void;
+  onLoginSuccess: () => void;
 }
 export type Account = {
   email: string;
@@ -67,28 +66,21 @@ export default function Signin({ onLoginSuccess }: SigninProps) {
   const [remember, setRemember] = useState(false);
   useEffect(() => {
     if (data) {
-      onLoginSuccess(data);
       setAccount({
         email: "",
         password: "",
       });
+      localStorage.removeItem("userLogin");
+      sessionStorage.removeItem("userLogin");
       if (remember) {
         localStorage.setItem("userLogin", JSON.stringify(data));
       } else {
         sessionStorage.setItem("userLogin", JSON.stringify(data));
       }
+      onLoginSuccess();
       const closeBtn = document.querySelector<HTMLButtonElement>(
         '#authentication-modal [data-modal-hide="authentication-modal"]'
       );
-
-      const loginModel = document.getElementById("authentication-modal");
-      loginModel?.classList.add("hidden");
-      loginModel?.setAttribute("aria-hidden", "true");
-
-      document
-        .querySelectorAll("[modal-backdrop]")
-        .forEach((el) => el.remove());
-      document.body.classList.remove("overflow-hidden");
 
       closeBtn?.click();
       distpatch(resetLogin());
@@ -113,6 +105,8 @@ export default function Signin({ onLoginSuccess }: SigninProps) {
   };
 
   return (
+    <>
+    <button type="button" id="open-login-modal" data-modal-target="authentication-modal" data-modal-show="authentication-modal" hidden />
     <div
       id="authentication-modal"
       tabIndex={-1}
@@ -215,7 +209,7 @@ export default function Signin({ onLoginSuccess }: SigninProps) {
                     htmlFor="remember"
                     className="ms-2 text-sm font-medium "
                   >
-                    Ghi nhớ mật khẩu
+                    Duy trì đăng nhập
                   </label>
                 </div>
                 <a
@@ -254,5 +248,6 @@ export default function Signin({ onLoginSuccess }: SigninProps) {
         </div>
       </div>
     </div>
+    </>
   );
 }

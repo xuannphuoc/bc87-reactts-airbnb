@@ -1,6 +1,6 @@
 // uploadAvatar.ts
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "@/services/apiServices";
 
 type UploadAvatarState = {
   data: any;
@@ -20,22 +20,9 @@ export const putAvatar = createAsyncThunk<
   { rejectValue: string }
 >("user/uploadAvatar", async (formData, { rejectWithValue }) => {
   try {
-    const userLogin =
-      JSON.parse(localStorage.getItem("userLogin") || "null") ||
-      JSON.parse(sessionStorage.getItem("userLogin") || "null");
-
-    const token = userLogin?.token;
-
-    const res = await axios.post(
-      "https://airbnbnew.cybersoft.edu.vn/api/users/upload-avatar",
-      formData,
-      {
-        headers: {
-          token,
-          tokenCybersoft:
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCA4NyIsIkhldEhhblN0cmluZyI6IjI3LzAzLzIwMjYiLCJIZXRIYW5UaW1lIjoiMTc3NDU2OTYwMDAwMCIsIm5iZiI6MTc0NzI0MjAwMCwiZXhwIjoxNzc0NzE3MjAwfQ.YJSCMUqM4JgIqsDiGq9fxRp3AOrIdxBO4t7xxj6K8dY",
-        },
-      }
+    const res = await api.post(
+      "users/upload-avatar",
+      formData
     );
 
     return res.data.content;

@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { AxiosError } from "axios";
 
-import axios from "axios";
+import api from "@/services/apiServices";
 
 import { type UserData } from "../../HomeTemplate/components/_Type/type.tsx";
 
@@ -21,13 +21,9 @@ export const getUser = createAsyncThunk<UserData, number>(
   "user/getUser",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios({
-        url: `https://airbnbnew.cybersoft.edu.vn/api/users/${id}`,
+      const response = await api({
+        url: `users/${id}`,
         method: "GET",
-        headers: {
-          tokenCybersoft:
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCA4NyIsIkhldEhhblN0cmluZyI6IjIzLzAzLzIwMjYiLCJIZXRIYW5UaW1lIjoiMTc3NDIyNDAwMDAwMCIsIm5iZiI6MTc0NzI0MjAwMCwiZXhwIjoxNzc0MzcxNjAwfQ.-W4bvmZuRBJxryMtPHaMnmm11rdGxNTYol7fLRQid1g",
-        },
       });
       return response.data.content;
     } catch (error) {
