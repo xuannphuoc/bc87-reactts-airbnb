@@ -8,3 +8,16 @@
     @apply bg-gray-200/80;
   }
 }
+@theme {
+  --font-sans: "Segoe UI", system-ui, Arial, sans-serif;
+}
+
+@layer base {
+  html, body {
+    font-family: var(--font-sans);
+  }
+
+  button, input, select, textarea {
+    font-family: inherit;
+  }
+}

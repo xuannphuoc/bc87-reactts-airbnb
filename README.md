@@ -18,6 +18,11 @@ dữ liệu mẫu, xóa khóa `airbnb-demo-db-v1` và các khóa phiên `userLog
 `ADMIN_INFO` trong DevTools rồi tải lại trang. Demo dùng tài khoản giả lập và
 chỉ phù hợp với dữ liệu thử nghiệm.
 
+Trang tổng quan quản trị đọc phòng, vị trí, tài khoản và lượt đặt từ cùng
+nguồn dữ liệu với các trang quản lý. Bảng lượt đặt mới nhất hiển thị theo mã
+đặt phòng giảm dần. Dữ liệu mẫu ban đầu chưa có lượt đặt, bạn có thể thêm một
+lượt tại `/admin/booking` để xem tổng quan cập nhật.
+
 `npm run build` kiểm tra TypeScript và tạo bản phát hành trong `dist/`.
 Khi triển khai, cấu hình máy chủ trả về `index.html` cho các đường dẫn của SPA
 như `/room/1` và `/admin/booking`.

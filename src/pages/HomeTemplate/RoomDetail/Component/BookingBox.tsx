@@ -63,7 +63,7 @@ export default function BookingBox({ room }: { room: DetailRoom }) {
               <div className="grid grid-cols-2">
                 <div className="col-span-1 p-2 flex justify-center items-center border-r">
                   <div className="ml-3 w-full">
-                    <label className="font-serif text-sm" htmlFor="nhanPhong">
+                    <label className="text-sm" htmlFor="nhanPhong">
                       Nhận phòng
                     </label>
                     <input
@@ -86,7 +86,7 @@ export default function BookingBox({ room }: { room: DetailRoom }) {
                 </div>
                 <div className="col-span-1 p-2 flex justify-center items-center">
                   <div className="ml-3 w-full">
-                    <label className="font-serif text-sm" htmlFor="traPhong">
+                    <label className="text-sm" htmlFor="traPhong">
                       Trả phòng
                     </label>
                     <input
@@ -104,7 +104,7 @@ export default function BookingBox({ room }: { room: DetailRoom }) {
 
               <div className="border-t">
                 <div className="mt-2 m-4">
-                  <label className="font-serif text-sm" htmlFor="">
+                  <label className="text-sm" htmlFor="">
                     Khách
                   </label>
                   <div className="flex justify-between items-center w-full mt-2">

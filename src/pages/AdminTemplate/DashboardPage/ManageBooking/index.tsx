@@ -1,4 +1,6 @@
-import { useEffect, useState, type ChangeEvent, type ReactNode } from "react";
+import AdminHeader from "../../_components/AdminHeader";
+import AdminDialog from "../../_components/AdminDialog";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../../../store";
 import {
@@ -18,26 +20,6 @@ interface FormData {
   soLuongKhach: number;
   maNguoiDung: number;
 }
-
-const Modal = ({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) => (
-  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-50">
-    <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-      <div className="flex items-center justify-between p-4 border-b ">
-        <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
-        <button onClick={onClose} className="text-gray-400 hover:text-gray-900">
-          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              fillRule="evenodd"
-              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </button>
-      </div>
-      {children}
-    </div>
-  </div>
-);
 
 const FormInput = ({
   label,
@@ -73,7 +55,7 @@ const FormInput = ({
       onChange={onChange}
       className={`bg-gray-50 border ${
         error ? "border-red-500" : "border-gray-300"
-      } text-gray-900 text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5`}
+      } text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
       placeholder={placeholder}
     />
     {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
@@ -299,28 +281,15 @@ export default function ManageBooking() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-7xl mx-auto">
-        <div className="bg-white rounded-lg shadow mb-6 p-6">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center">
-              <svg
-                className="w-12 h-12 text-rose-600"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-              </svg>
-              <div className="ml-4">
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Quản lý Đặt phòng
-                </h1>
-                <p className="text-sm text-gray-500">Hệ thống Airbnb Admin</p>
-              </div>
-            </div>
+    <div>
+      <div>
+        <AdminHeader
+          title="Quản lý đặt phòng"
+          description="Theo dõi và cập nhật lịch lưu trú."
+          action={
             <button
               onClick={openAddModal}
-              className="bg-rose-600 hover:bg-rose-700 text-white font-medium rounded-lg text-sm px-5 py-2.5 inline-flex items-center"
+              className="admin-primary"
             >
               <svg
                 className="w-5 h-5 mr-2"
@@ -335,8 +304,8 @@ export default function ManageBooking() {
               </svg>
               Thêm đặt phòng
             </button>
-          </div>
-        </div>
+          }
+        />
 
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
@@ -344,7 +313,7 @@ export default function ManageBooking() {
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow mb-6 p-4">
+        <div className="admin-panel mb-6 p-4">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
               <svg
@@ -363,22 +332,22 @@ export default function ManageBooking() {
               type="text"
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full pl-10 p-2.5"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 p-2.5"
               placeholder="Tìm kiếm theo ID, mã phòng, mã người dùng..."
             />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="admin-panel overflow-hidden">
           {loading && filteredBookings.length === 0 ? (
             <div className="p-8 text-center">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-rose-600"></div>
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
               <p className="mt-2 text-gray-600">Đang tải...</p>
             </div>
           ) : (
-            <div className="overflow-x-auto overflow-y-auto lg:h-[50vh] xl:h-[65vh]">
-              <table className="w-full text-sm text-left text-gray-500">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0">
+            <div className="overflow-x-auto">
+              <table className="admin-table">
+                <thead>
                   <tr>
                     <th className="px-6 py-3">ID</th>
                     <th className="px-6 py-3">Mã phòng</th>
@@ -403,7 +372,7 @@ export default function ManageBooking() {
                     currentItems.map((booking) => (
                       <tr
                         key={booking.id}
-                        className="bg-white border-b dark:border-gray-100 hover:bg-gray-50"
+                        className="bg-white border-b hover:bg-gray-50"
                       >
                         <td className="px-6 py-4 font-medium text-gray-900">
                           {booking.id}
@@ -479,7 +448,7 @@ export default function ManageBooking() {
         </div>
 
         {filteredBookings.length > 0 && (
-          <div className="bg-white rounded-lg shadow mt-4 p-4">
+          <div className="admin-panel mt-4 p-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-sm text-gray-700">
                 Hiển thị{" "}
@@ -533,7 +502,7 @@ export default function ManageBooking() {
                           onClick={() => paginate(page as number)}
                           className={`flex items-center justify-center px-3 h-8 leading-tight border border-gray-300 ${
                             currentPage === page
-                              ? "text-rose-600 bg-rose-50 hover:bg-rose-100 hover:text-rose-700"
+                              ? "text-indigo-600 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-700"
                               : "text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700"
                           }`}
                         >
@@ -577,7 +546,7 @@ export default function ManageBooking() {
         )}
 
         {(showAddModal || (showEditModal && selectedBooking)) && (
-          <Modal
+          <AdminDialog
             title={showEditModal ? "Chỉnh sửa đặt phòng" : "Thêm đặt phòng mới"}
             onClose={closeBookingForm}
           >
@@ -678,25 +647,25 @@ export default function ManageBooking() {
               <button
                 onClick={showEditModal ? handleEditBooking : handleAddBooking}
                 disabled={loading}
-                className="text-white bg-rose-600 hover:bg-rose-700 font-medium rounded-lg text-sm px-5 py-2.5"
+                className="admin-primary font-medium rounded-lg text-sm px-5 py-2.5"
               >
                 {showEditModal ? "Cập nhật" : "Thêm đặt phòng"}
               </button>
             </div>
-          </Modal>
+          </AdminDialog>
         )}
 
         {showViewModal && selectedBooking && (
-          <Modal
+          <AdminDialog
             title="Thông tin đặt phòng"
             onClose={() => setShowViewModal(false)}
           >
             <div className="p-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-center mb-6">
-                  <div className="w-24 h-24 bg-rose-100 rounded-full flex items-center justify-center">
+                  <div className="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center">
                     <svg
-                      className="w-12 h-12 text-rose-600"
+                      className="w-12 h-12 text-indigo-600"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -755,16 +724,16 @@ export default function ManageBooking() {
             <div className="flex items-center justify-end gap-3 p-4 border-t">
               <button
                 onClick={() => setShowViewModal(false)}
-                className="text-white bg-rose-600 hover:bg-rose-700 font-medium rounded-lg text-sm px-5 py-2.5"
+                className="admin-primary font-medium rounded-lg text-sm px-5 py-2.5"
               >
                 Đóng
               </button>
             </div>
-          </Modal>
+          </AdminDialog>
         )}
 
         {showDeleteModal && selectedBooking && (
-          <Modal title="Xác nhận xóa" onClose={() => setShowDeleteModal(false)}>
+          <AdminDialog title="Xác nhận xóa" onClose={() => setShowDeleteModal(false)}>
             <div className="p-6">
               <div className="flex items-center mb-4">
                 <div className="shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
@@ -806,7 +775,7 @@ export default function ManageBooking() {
                 Xóa
               </button>
             </div>
-          </Modal>
+          </AdminDialog>
         )}
       </div>
     </div>
