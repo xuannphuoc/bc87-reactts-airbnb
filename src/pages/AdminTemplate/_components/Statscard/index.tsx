@@ -1,25 +1,27 @@
-import type { ReactNode } from "react";
+import type { IconType } from "react-icons";
 
-interface Props {
+export default function StatsCard({
+  title,
+  value,
+  icon: Icon,
+  tone,
+}: {
   title: string;
-  value: string | number;
-  icon?: ReactNode;
-}
-
-export default function StatsCard({ title, value, icon }: Props) {
+  value: string;
+  icon: IconType;
+  tone: string;
+}) {
   return (
-    <div
-      style={{
-        padding: 20,
-        border: "1px solid #eee",
-        borderRadius: 12,
-        width: 260,
-        background: "#fff",
-      }}
-    >
-      <div style={{ fontSize: 14, color: "#666" }}>{title}</div>
-      <div style={{ fontSize: 28, fontWeight: 700 }}>{value}</div>
-      <div>{icon}</div>
-    </div>
+    <article className="admin-panel flex items-center gap-4 p-4 sm:p-5">
+      <span
+        className={`grid size-11 shrink-0 place-items-center rounded-xl ${tone}`}
+      >
+        <Icon size={21} aria-hidden="true" />
+      </span>
+      <dl>
+        <dt className="text-sm text-slate-600">{title}</dt>
+        <dd className="text-2xl font-bold tabular-nums">{value}</dd>
+      </dl>
+    </article>
   );
 }

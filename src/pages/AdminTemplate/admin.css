@@ -1,0 +1,118 @@
+.admin-shell,
+.admin-auth {
+  --admin-accent: #4338ca;
+  --admin-ink: #17233e;
+  --admin-muted: #53617a;
+  --admin-border: #e1e7f0;
+  --admin-surface: #fff;
+  --admin-background: #f3f6fb;
+  color: var(--admin-ink);
+  color-scheme: light;
+  background: var(--admin-background);
+}
+
+.admin-panel {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 1rem;
+}
+
+.admin-shell :focus-visible,
+.admin-auth :focus-visible {
+  outline: 2px solid var(--admin-accent);
+  outline-offset: 3px;
+}
+
+.admin-primary {
+  display: inline-flex;
+  min-height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.625rem;
+  background: var(--admin-accent);
+  padding: 0.55rem 1rem;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.admin-primary:hover {
+  background: #3730a3;
+}
+.admin-primary:disabled {
+  opacity: 0.6;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  text-align: left;
+  color: var(--admin-ink);
+}
+
+.admin-table thead {
+  background: #f5f7fc;
+  color: var(--admin-muted);
+  font-size: 0.75rem;
+}
+
+.admin-table :is(th, td) {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-table tbody tr:last-child > td {
+  border-bottom: 0;
+}
+.admin-table tbody tr:hover {
+  background: #f8faff;
+}
+
+.admin-shell
+  :is(
+    input:not([type="checkbox"], [type="radio"], [type="file"]),
+    select,
+    textarea
+  ),
+.admin-auth input {
+  border: 1px solid #d5deeb;
+  border-radius: 0.625rem;
+  background: white;
+  color: var(--admin-ink);
+}
+
+.admin-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(42rem, calc(100% - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  border: 1px solid var(--admin-border);
+  border-radius: 1rem;
+  background: white;
+  color: var(--admin-ink);
+  box-shadow: 0 20px 60px #17233e33;
+}
+
+.admin-dialog[data-wide="true"] {
+  width: min(64rem, calc(100% - 2rem));
+}
+.admin-dialog::backdrop {
+  background: #17233e88;
+}
+.admin-dialog > header {
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-shell input.border-red-500,
+.admin-shell textarea.border-red-500,
+.admin-shell select.border-red-500 {
+  border-color: #ef4444;
+}
+
+.admin-shell input[type="checkbox"],
+.admin-shell input[type="radio"] {
+  accent-color: var(--admin-accent);
+}

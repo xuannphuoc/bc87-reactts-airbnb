@@ -52,14 +52,14 @@ export const renderRoutes = () => {
   return routes.map((route) => {
     if (route.nested) {
       return (
-        <Route path={route.path} element={<route.element />}>
+        <Route key={route.path} path={route.path} element={<route.element />}>
           {route.nested.map((item) => (
-            <Route path={item.path} element={<item.element />} />
+            <Route key={item.path} path={item.path} element={<item.element />} />
           ))}
         </Route>
       );
     } else {
-      return <Route path={route.path} element={<route.element />} />;
+      return <Route key={route.path} path={route.path} element={<route.element />} />;
     }
   });
 };

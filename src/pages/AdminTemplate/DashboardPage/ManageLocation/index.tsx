@@ -1,3 +1,5 @@
+import AdminHeader from "../../_components/AdminHeader";
+import AdminDialog from "../../_components/AdminDialog";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -11,31 +13,6 @@ import {
   type LocationFormData,
 } from "./slice";
 import type { AppDispatch, RootState } from "./../../../../store/index";
-
-const Modal = ({ title, children, onClose }: any) => (
-  <div className="fixed inset-0 bg-gray-900 dark:bg-gray-900 bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-      <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-          {title}
-        </h3>
-        <button
-          onClick={onClose}
-          className="text-gray-400 hover:text-gray-900 dark:hover:text-white"
-        >
-          <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              fillRule="evenodd"
-              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </button>
-      </div>
-      {children}
-    </div>
-  </div>
-);
 
 interface FormInputProps {
   label: string;
@@ -59,7 +36,7 @@ const FormInput: React.FC<FormInputProps> = ({
   error,
 }) => (
   <div>
-    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+    <label className="block mb-2 text-sm font-medium text-gray-900">
       {label} {required && <span className="text-red-600">*</span>}
     </label>
     <input
@@ -67,13 +44,13 @@ const FormInput: React.FC<FormInputProps> = ({
       name={name}
       value={value}
       onChange={onChange}
-      className={`bg-gray-50 dark:bg-gray-700 border ${
-        error ? "border-red-500" : "border-gray-300 dark:border-gray-600"
-      } text-gray-900 dark:text-white text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5 dark:placeholder-gray-400`}
+      className={`bg-gray-50 border ${
+        error ? "border-red-500" : "border-gray-300"
+      } text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
       placeholder={placeholder}
     />
     {error && (
-      <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>
+      <p className="mt-2 text-sm text-red-600">{error}</p>
     )}
   </div>
 );
@@ -153,7 +130,7 @@ export default function ManageLocation() {
     if (!formData.hinhAnh.trim()) {
       newErrors.hinhAnh = "URL hình ảnh là bắt buộc";
     } else if (
-      !/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(formData.hinhAnh)
+      !(/^(https?:\/\/|data:image\/)/i.test(formData.hinhAnh) || formData.hinhAnh.startsWith(import.meta.env.BASE_URL + "images/"))
     ) {
       newErrors.hinhAnh = "URL hình ảnh không hợp lệ";
     }
@@ -250,34 +227,15 @@ export default function ManageLocation() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 dark:bg-gray-50 p-4">
-      <div className="max-w-7xl mx-auto">
-        <div className="bg-gray-900 dark:bg-gray-50 rounded-lg shadow mb-6 p-6">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center">
-              <svg
-                className="w-12 h-12 text-rose-600 dark:text-rose-500"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <div className="ml-4">
-                <h1 className="text-2xl font-bold text-white dark:text-gray-900">
-                  Quản lý Vị trí
-                </h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Hệ thống Airbnb Admin
-                </p>
-              </div>
-            </div>
+    <div>
+      <div>
+        <AdminHeader
+          title="Quản lý vị trí"
+          description="Quản lý các khu vực có phòng cho thuê."
+          action={
             <button
               onClick={openAddModal}
-              className="bg-rose-600 hover:bg-rose-700 text-white font-medium rounded-lg text-sm px-5 py-2.5 inline-flex items-center dark:bg-rose-600 dark:hover:bg-rose-700"
+              className="admin-primary"
             >
               <svg
                 className="w-5 h-5 mr-2"
@@ -292,20 +250,20 @@ export default function ManageLocation() {
               </svg>
               Thêm vị trí
             </button>
-          </div>
-        </div>
+          }
+        />
 
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
-            <p className="text-sm text-red-800 dark:text-red-400">{error}</p>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <p className="text-sm text-red-800">{error}</p>
           </div>
         )}
 
-        <div className="bg-gray-800 dark:bg-gray-50 rounded-lg shadow mb-6 p-4">
+        <div className="admin-panel mb-6 p-4">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
               <svg
-                className="w-5 h-5 text-gray-500 dark:text-gray-400"
+                className="w-5 h-5 text-gray-500"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -320,24 +278,24 @@ export default function ManageLocation() {
               type="text"
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
-              className="bg-gray-700 dark:bg-gray-50 border border-gray-600 dark:border-gray-300 text-white dark:text-gray-900 text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full pl-10 p-2.5 dark:placeholder-gray-400"
+              className="bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 p-2.5"
               placeholder="Tìm kiếm theo tên vị trí, tỉnh thành, quốc gia..."
             />
           </div>
         </div>
 
-        <div className="bg-gray-800 dark:bg-gray-50 rounded-lg shadow overflow-hidden">
+        <div className="admin-panel overflow-hidden">
           {loading && filteredLocations.length === 0 ? (
             <div className="p-8 text-center">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-rose-600"></div>
-              <p className="mt-2 text-gray-600 dark:text-gray-400">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+              <p className="mt-2 text-gray-600">
                 Đang tải...
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto  overflow-y-auto lg:h-[50vh] xl:h-[65vh]">
-              <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 ">
-                <thead className="text-xs text-gray-100 dark:text-gray-600 uppercase bg-gray-700 dark:bg-gray-100 sticky top-0">
+            <div className="overflow-x-auto">
+              <table className="admin-table">
+                <thead>
                   <tr>
                     <th className="px-6 py-3">ID</th>
                     <th className="px-6 py-3">Hình ảnh</th>
@@ -352,7 +310,7 @@ export default function ManageLocation() {
                     <tr>
                       <td
                         colSpan={6}
-                        className="px-6 py-8 text-center text-gray-500 dark:text-gray-400"
+                        className="px-6 py-8 text-center text-gray-500"
                       >
                         Không tìm thấy vị trí nào
                       </td>
@@ -361,9 +319,9 @@ export default function ManageLocation() {
                     filteredLocations.map((location) => (
                       <tr
                         key={location.id}
-                        className="bg-gray-800 border-b hover:bg-gray-700 dark:bg-gray-50 dark:border-gray-50 dark:hover:bg-gray-100"
+                        className="bg-white border-b hover:bg-slate-50"
                       >
-                        <td className="px-6 py-4 font-medium text-gray-50 dark:text-gray-700">
+                        <td className="px-6 py-4 font-medium text-gray-50">
                           {location.id}
                         </td>
                         <td className="px-6 py-4">
@@ -384,7 +342,7 @@ export default function ManageLocation() {
                           <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() => openViewModal(location)}
-                              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                              className="text-blue-600 hover:text-blue-800"
                               title="Xem"
                             >
                               <svg
@@ -402,7 +360,7 @@ export default function ManageLocation() {
                             </button>
                             <button
                               onClick={() => openEditModal(location)}
-                              className="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300"
+                              className="text-yellow-600 hover:text-yellow-800"
                               title="Sửa"
                             >
                               <svg
@@ -415,7 +373,7 @@ export default function ManageLocation() {
                             </button>
                             <button
                               onClick={() => openDeleteModal(location)}
-                              className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                              className="text-red-600 hover:text-red-800"
                               title="Xóa"
                             >
                               <svg
@@ -442,7 +400,7 @@ export default function ManageLocation() {
         </div>
 
         {showAddModal && (
-          <Modal title="Thêm vị trí mới" onClose={() => setShowAddModal(false)}>
+          <AdminDialog title="Thêm vị trí mới" onClose={() => setShowAddModal(false)}>
             <>
               <div className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -492,27 +450,27 @@ export default function ManageLocation() {
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-3 p-4 border-t dark:border-gray-700">
+              <div className="flex items-center justify-end gap-3 p-4 border-t">
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className="text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 font-medium rounded-lg text-sm px-5 py-2.5"
+                  className="text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5"
                 >
                   Hủy
                 </button>
                 <button
                   onClick={handleAddLocation}
                   disabled={loading}
-                  className="text-white bg-rose-600 hover:bg-rose-700 font-medium rounded-lg text-sm px-5 py-2.5 disabled:opacity-50"
+                  className="admin-primary font-medium rounded-lg text-sm px-5 py-2.5 disabled:opacity-50"
                 >
                   Thêm vị trí
                 </button>
               </div>
             </>
-          </Modal>
+          </AdminDialog>
         )}
 
         {showEditModal && selectedLocation && (
-          <Modal
+          <AdminDialog
             title="Chỉnh sửa vị trí"
             onClose={() => setShowEditModal(false)}
           >
@@ -565,27 +523,27 @@ export default function ManageLocation() {
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-3 p-4 border-t dark:border-gray-700">
+              <div className="flex items-center justify-end gap-3 p-4 border-t">
                 <button
                   onClick={() => setShowEditModal(false)}
-                  className="text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 font-medium rounded-lg text-sm px-5 py-2.5"
+                  className="text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5"
                 >
                   Hủy
                 </button>
                 <button
                   onClick={handleEditLocation}
                   disabled={loading}
-                  className="text-white bg-rose-600 hover:bg-rose-700 font-medium rounded-lg text-sm px-5 py-2.5 disabled:opacity-50"
+                  className="admin-primary font-medium rounded-lg text-sm px-5 py-2.5 disabled:opacity-50"
                 >
                   Cập nhật
                 </button>
               </div>
             </>
-          </Modal>
+          </AdminDialog>
         )}
 
         {showViewModal && selectedLocation && (
-          <Modal
+          <AdminDialog
             title="Thông tin vị trí"
             onClose={() => setShowViewModal(false)}
           >
@@ -605,60 +563,60 @@ export default function ManageLocation() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      <p className="text-sm font-medium text-gray-500">
                         ID
                       </p>
-                      <p className="text-base text-gray-900 dark:text-white">
+                      <p className="text-base text-gray-900">
                         {selectedLocation.id}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      <p className="text-sm font-medium text-gray-500">
                         Tên vị trí
                       </p>
-                      <p className="text-base text-gray-900 dark:text-white">
+                      <p className="text-base text-gray-900">
                         {selectedLocation.tenViTri}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      <p className="text-sm font-medium text-gray-500">
                         Tỉnh thành
                       </p>
-                      <p className="text-base text-gray-900 dark:text-white">
+                      <p className="text-base text-gray-900">
                         {selectedLocation.tinhThanh}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      <p className="text-sm font-medium text-gray-500">
                         Quốc gia
                       </p>
-                      <p className="text-base text-gray-900 dark:text-white">
+                      <p className="text-base text-gray-900">
                         {selectedLocation.quocGia}
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-3 p-4 border-t dark:border-gray-700">
+              <div className="flex items-center justify-end gap-3 p-4 border-t">
                 <button
                   onClick={() => setShowViewModal(false)}
-                  className="text-white bg-rose-600 hover:bg-rose-700 font-medium rounded-lg text-sm px-5 py-2.5"
+                  className="admin-primary font-medium rounded-lg text-sm px-5 py-2.5"
                 >
                   Đóng
                 </button>
               </div>
             </>
-          </Modal>
+          </AdminDialog>
         )}
 
         {showDeleteModal && selectedLocation && (
-          <Modal title="Xác nhận xóa" onClose={() => setShowDeleteModal(false)}>
+          <AdminDialog title="Xác nhận xóa" onClose={() => setShowDeleteModal(false)}>
             <>
               <div className="p-6">
                 <div className="flex items-center mb-4">
-                  <div className="shrink-0 w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                  <div className="shrink-0 w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
                     <svg
-                      className="w-6 h-6 text-red-600 dark:text-red-400"
+                      className="w-6 h-6 text-red-600"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -670,10 +628,10 @@ export default function ManageLocation() {
                     </svg>
                   </div>
                   <div className="ml-4">
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                    <h3 className="text-lg font-medium text-gray-900">
                       Xóa vị trí
                     </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-gray-500 mt-1">
                       Bạn có chắc chắn muốn xóa vị trí{" "}
                       <strong>{selectedLocation.tenViTri}</strong>? Hành động
                       này không thể hoàn tác.
@@ -681,10 +639,10 @@ export default function ManageLocation() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-3 p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+              <div className="flex items-center justify-end gap-3 p-4 border-t bg-gray-50">
                 <button
                   onClick={() => setShowDeleteModal(false)}
-                  className="text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 font-medium rounded-lg text-sm px-5 py-2.5"
+                  className="text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5"
                 >
                   Hủy
                 </button>
@@ -697,7 +655,7 @@ export default function ManageLocation() {
                 </button>
               </div>
             </>
-          </Modal>
+          </AdminDialog>
         )}
       </div>
     </div>

@@ -11,7 +11,9 @@ export interface User {
 
 export default function AuthPage() {
   const error = useSelector((state: RootState) => state.authReducer.error);
-  const data = useSelector((state: RootState) => state.authReducer.data);
+  const { data, loading } = useSelector(
+    (state: RootState) => state.authReducer,
+  );
   const dispatch = useDispatch<AppDispatch>();
 
   const [user, setUser] = useState<User>({
@@ -20,7 +22,6 @@ export default function AuthPage() {
   });
 
   if (data) {
-    console.log(data);
     return <Navigate to={"/admin"} />;
   }
 
@@ -38,54 +39,71 @@ export default function AuthPage() {
   };
 
   return (
-    <>
-      {error && (
-        <div
-          className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
-          role="alert"
-        >
-          {error?.response?.data.content}
-        </div>
-      )}
+    <main className="admin-auth grid min-h-dvh place-items-center px-4 py-8">
       <form
         onSubmit={handleSubmit}
-        className="max-w-sm mx-auto my-20 border-2 border-pink-500  border-solid shadow-xl/30 m-5 p-5 border-spacing-2 rounded-md"
+        className="admin-panel w-full max-w-sm p-6 sm:p-8"
       >
-        <div className="mb-5">
-          <label
-            htmlFor="email"
-            className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
+        <h1 className="text-2xl font-bold tracking-tight">
+          Đăng nhập quản trị
+        </h1>
+        <p className="mt-1 text-sm text-slate-600">
+          Dùng tài khoản quản trị để truy cập.
+        </p>
+        {error && (
+          <p
+            role="alert"
+            className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800"
           >
-            Email
-          </label>
-          <input
-            onChange={handleOnChange}
-            name="email"
-            type="text"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          />
-        </div>
-        <div className="mb-5">
-          <label
-            htmlFor="password"
-            className="block mb-2 text-sm font-medium text-gray-900 dark:text-black"
+            {error.response?.data.content ?? "Đăng nhập thất bại."}
+          </p>
+        )}
+        <div className="mt-6 space-y-4">
+          <div>
+            <label
+              htmlFor="admin-email"
+              className="mb-1.5 block text-sm font-medium"
+            >
+              Email
+            </label>
+            <input
+              id="admin-email"
+              name="email"
+              type="email"
+              autoComplete="username"
+              required
+              value={user.email}
+              onChange={handleOnChange}
+              className="w-full px-3 py-2.5 text-sm"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="admin-password"
+              className="mb-1.5 block text-sm font-medium"
+            >
+              Mật khẩu
+            </label>
+            <input
+              id="admin-password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              required
+              value={user.password}
+              onChange={handleOnChange}
+              className="w-full px-3 py-2.5 text-sm"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="admin-primary w-full"
           >
-            Password
-          </label>
-          <input
-            onChange={handleOnChange}
-            name="password"
-            type="password"
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          />
+            {loading ? "Đang đăng nhập…" : "Đăng nhập"}
+          </button>
         </div>
-        <button
-          type="submit"
-          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 flex justify-center font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-pink-600 dark:hover:bg-pink-700 dark:focus:ring-pink-800"
-        >
-          Submit
-        </button>
       </form>
-    </>
+    </main>
   );
 }

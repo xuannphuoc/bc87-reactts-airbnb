@@ -1,11 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { AxiosError } from "axios";
-import axios from "axios";
+import api from "@/services/apiServices";
 import { type Account } from "./index.tsx";
-import { putUserReducer } from "@/pages/User/getAPI/putUser.ts";
-import type { UserData } from "../_Type/type.tsx";
+import type { DemoSession } from "@/services/demoSession";
 export type StateInitial = {
-  data: UserData | null;
+  data: DemoSession | null;
   loading: boolean;
   error: string | null;
 };
@@ -16,25 +15,21 @@ const initialState: StateInitial = {
   error: null,
 };
 
-export const Login = createAsyncThunk<UserData, Account, 
+export const Login = createAsyncThunk<DemoSession, Account,
 {
   rejectValue: string
 }>(
   "login",
   async (account: Account, { rejectWithValue }) => {
     try {
-      const response = await axios({
-        url: "https://airbnbnew.cybersoft.edu.vn/api/auth/signin",
+      const response = await api({
+        url: "auth/signin",
         method: "POST",
         data: account,
-        headers: {
-          TokenCybersoft:
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCA4NyIsIkhldEhhblN0cmluZyI6IjIzLzAzLzIwMjYiLCJIZXRIYW5UaW1lIjoiMTc3NDIyNDAwMDAwMCIsIm5iZiI6MTc0NzI0MjAwMCwiZXhwIjoxNzc0MzcxNjAwfQ.-W4bvmZuRBJxryMtPHaMnmm11rdGxNTYol7fLRQid1g",
-        },
       });
       return response.data.content;
     } catch (error) {
-      const err = error as AxiosError<any>
+      const err = error as AxiosError<{ content?: string; message?: string }>
       const message =  err.response?.data?.content || err.response?.data?.message || "Tài khoản or mật khẩu không chính xác"
       return rejectWithValue(message)
     }
@@ -66,14 +61,6 @@ const LoginReducer = createSlice({
     builder.addCase(Login.fulfilled, (state, action) => {
       state.loading = false;
       state.data = action.payload;
-    });
-    builder.addCase(putUserReducer.fulfilled, (state, action) => {
-      if (state.data) {
-        state.data = {
-          ...state.data,
-          ...action.payload,
-        };
-      }
     });
     builder.addCase(Login.rejected, (state, action) => {
     state.loading = false;

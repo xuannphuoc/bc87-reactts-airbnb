@@ -1,6 +1,6 @@
 import type { AxiosError } from "axios";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "@/services/apiServices";
 import type { DetailRoom } from "../../components/_Type/type.tsx";
 interface StateRoom {
   data: DetailRoom | null;
@@ -17,13 +17,9 @@ export const getDetailRoom = createAsyncThunk(
   "detail/getDetailRoom",
   async (id: number, { rejectWithValue }) => {
     try {
-      const response = await axios({
+      const response = await api({
         method: "GET",
-        url: `https://airbnbnew.cybersoft.edu.vn/api/phong-thue/${id}`,
-        headers: {
-          tokenCybersoft:
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCA4NyIsIkhldEhhblN0cmluZyI6IjIzLzAzLzIwMjYiLCJIZXRIYW5UaW1lIjoiMTc3NDIyNDAwMDAwMCIsIm5iZiI6MTc0NzI0MjAwMCwiZXhwIjoxNzc0MzcxNjAwfQ.-W4bvmZuRBJxryMtPHaMnmm11rdGxNTYol7fLRQid1g",
-        },
+        url: `phong-thue/${id}`,
       });
       return response.data.content;
     } catch (error) {
@@ -39,12 +35,15 @@ const detailRoomSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(getDetailRoom.pending, (state) => {
       state.loading = true;
+      state.data = null;
+      state.error = null;
     });
     builder.addCase(getDetailRoom.fulfilled, (state, action) => {
       state.loading = false;
       state.data = action.payload;
     });
     builder.addCase(getDetailRoom.rejected, (state, action) => {
+      if (action.meta.aborted) return;
       state.loading = false;
       state.error = action.payload as AxiosError;
     });

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { AxiosError } from "axios";
-import axios from "axios";
+import api from "@/services/apiServices";
 
 export interface FormBookRom {
   id?: number;
@@ -23,30 +23,14 @@ const initialState: InitialState = {
   error: null,
 };
 
-let token = null;
-
-const localData = localStorage.getItem("userLogin");
-const sessionData = sessionStorage.getItem("userLogin");
-
-if (localData) {
-  token = JSON.parse(localData).token;
-} else if (sessionData) {
-  token = JSON.parse(sessionData).token;
-}
-
 export const bookRoomReducer = createAsyncThunk<any, FormBookRom>(
   "bookRoomReducer",
   async (data, { rejectWithValue }) => {
     try {
-      const response = await axios({
-        url: `https://airbnbnew.cybersoft.edu.vn/api/dat-phong`,
+      const response = await api({
+        url: `dat-phong`,
         method: "POST",
         data,
-        headers: {
-          token: `Bearer ${token?.token}`,
-          tokenCybersoft:
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCA4NyIsIkhldEhhblN0cmluZyI6IjIzLzAzLzIwMjYiLCJIZXRIYW5UaW1lIjoiMTc3NDIyNDAwMDAwMCIsIm5iZiI6MTc0NzI0MjAwMCwiZXhwIjoxNzc0MzcxNjAwfQ.-W4bvmZuRBJxryMtPHaMnmm11rdGxNTYol7fLRQid1g",
-        },
       });
       return response.data.content;
     } catch (error: any) {

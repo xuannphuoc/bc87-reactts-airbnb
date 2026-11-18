@@ -1,3 +1,4 @@
+import { readDemoSession } from "@/services/demoSession";
 import { initFlowbite } from "flowbite";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
@@ -5,7 +6,6 @@ import { type AppDispatch, type RootState } from "@/store/index";
 import { getDataLocation } from "../getAPI/navbar.ts";
 import Register from "../Register/index.tsx";
 import Signin from "../Login/index.tsx";
-import type { UserData } from "../_Type/type.tsx";
 import { Link } from "react-router-dom";
 import { useGotoDetail } from "../customHooks/useGotoDetail.tsx";
 import { getRoomByUser } from "../../../User/getAPI/getRoomByUser.ts";
@@ -40,12 +40,7 @@ export default function Navbar() {
   }, []);
 
   // get User
-  const rawUser =
-    localStorage.getItem("userLogin") || sessionStorage.getItem("userLogin");
-
-  const id = rawUser
-    ? JSON.parse(rawUser)?.user?.id ?? JSON.parse(rawUser)?.maNguoiDung
-    : null;
+  const id = readDemoSession()?.user.id;
   useEffect(() => {
     if (id) {
       dispatch(getUser(id));
@@ -90,8 +85,9 @@ export default function Navbar() {
   }, [dispatch]);
 
   // login
-  const handleLogin = (user: UserData) => {
-    localStorage.setItem("userLogin", JSON.stringify(user));
+  const handleLogin = () => {
+    const userId = readDemoSession()?.user.id;
+    if (userId) dispatch(getUser(userId));
     setTimeout(() => initFlowbite(), 100);
   };
   // logout
@@ -219,8 +215,8 @@ export default function Navbar() {
       </nav>
 
       <Signin
-        onLoginSuccess={(user) => {
-          handleLogin(user);
+        onLoginSuccess={() => {
+          handleLogin();
           setShowSuccess(true);
         }}
       />

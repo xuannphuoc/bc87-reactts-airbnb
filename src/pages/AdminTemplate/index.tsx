@@ -1,3 +1,4 @@
+import "./admin.css";
 import type { RootState } from "../../store";
 import { Outlet, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -12,13 +13,13 @@ export default function AdminTemplate() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="admin-shell flex min-h-dvh flex-col md:flex-row">
       <Sidebar />
-      <div className="flex flex-col flex-1 overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col">
         <Topbar />
-        <div className="flex-1 overflow-y-auto p-5">
+        <main className="mx-auto w-full max-w-[92rem] flex-1 px-4 py-6 sm:px-7 lg:px-9">
           <Outlet />
-        </div>
+        </main>
       </div>
     </div>
   );

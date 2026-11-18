@@ -53,52 +53,30 @@ export default function Topbar() {
     }
   };
 
-  const getAvatarUrl = () => {
-    if (currentUser?.avatar) {
-      return currentUser.avatar;
-    }
-    if (currentUser?.name) {
-      return `https://ui-avatars.com/api/?name=${encodeURIComponent(
-        currentUser.name
-      )}&background=random`;
-    }
-    return "https://flowbite.com/docs/images/people/profile-picture-5.jpg";
-  };
-
   return (
     <>
-      <div
-        className=""
-        style={{
-          height: 60,
-          borderBottom: "1px solid #eee",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0 20px",
-          fontWeight: 600,
-        }}
-      >
-        Admin
+      <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-7 lg:px-9">
+        <span className="text-sm font-semibold text-slate-600">Khu vực quản trị</span>
         <div className="flex items-center">
           <div className="flex items-center ms-3 relative" ref={dropdownRef}>
             <div>
               <button
                 type="button"
-                className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+                className="flex items-center gap-2 rounded-lg px-2 py-1 text-sm font-semibold hover:bg-slate-100"
                 aria-expanded={isDropdownOpen}
                 onClick={toggleDropdown}
               >
-                <span className="sr-only">Open user menu</span>
+                <span className="sr-only">Mở menu tài khoản</span>
                 {loading ? (
                   <div className="w-8 h-8 rounded-full bg-gray-300 animate-pulse"></div>
                 ) : (
                   <img
                     className="w-8 h-8 rounded-full object-cover"
-                    src={getAvatarUrl()}
-                    alt="user photo"
+                    src={currentUser?.avatar || import.meta.env.BASE_URL + "images/avatar.png"}
+                    alt=""
                   />
                 )}
+                <span className="hidden sm:inline">{currentUser?.name}</span>
               </button>
             </div>
 
@@ -187,7 +165,7 @@ export default function Topbar() {
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
       <UserProfileModal
         isOpen={isModalOpen}

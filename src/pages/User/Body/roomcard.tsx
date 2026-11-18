@@ -1,80 +1,34 @@
-import type { RoomByUser } from "../getAPI/getRoomByUser.ts";
-import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "@/store";
-import { getRoomsDetail, clearRooms } from "../getAPI/roomBooked.ts";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import RoomCard from "@/components/RoomCard";
+import api from "@/services/apiServices";
+import type { DetailRoom } from "@/pages/HomeTemplate/components/_Type/type";
+import type { RoomByUser } from "../getAPI/getRoomByUser";
 
-type Props = {
-  data: RoomByUser[];
-  loading: boolean;
-};
-
-export default function RoomCard({ data, loading }: Props) {
-  const dispatch = useDispatch<AppDispatch>();
+export default function BookedRooms({ data, loading }: { data: RoomByUser[]; loading: boolean }) {
+  const [catalog, setCatalog] = useState<DetailRoom[] | null>(null);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    if (!data.length) return;
-    dispatch(clearRooms());
-    data.forEach((booking) => {
-      dispatch(getRoomsDetail(booking.maPhong));
-    });
-  }, [data, dispatch]);
+    const controller = new AbortController();
+    api.get("/phong-thue", { signal: controller.signal })
+      .then(({ data }) => setCatalog(data.content))
+      .catch(() => {
+        if (!controller.signal.aborted) setFailed(true);
+      });
+    return () => controller.abort();
+  }, [data]);
 
-  const rooms = useSelector((state: RootState) => state.userRoomsSlice.data);
+  if (failed) return <p>Không tải được phòng đã đặt.</p>;
+  if (loading || !catalog) return <p>Đang tải phòng...</p>;
+  if (!data.length) return <p>Chưa có phòng nào được đặt.</p>;
 
-  if (loading) return <p>Đang tải phòng...</p>;
-
-  if (!rooms.length) return <p>Chưa có phòng nào được đặt</p>;
+  const rooms = new Map(catalog.map((room) => [room.id, room]));
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {rooms.map((room) => (
-        <div
-          key={room.id}
-          className="group p-4 border rounded-xl bg-white hover:shadow-md"
-        >
-          <div className="flex flex-col sm:flex-row gap-4">
-            <img
-              src={room.hinhAnh}
-              alt={room.tenPhong}
-              className="sm:w-48 h-40 object-cover rounded-md"
-            />
-
-            <div className="flex flex-col justify-between flex-1">
-              <div>
-                <h3 className="font-semibold text-lg mb-2">{room.tenPhong}</h3>
-
-                <div className="flex flex-wrap gap-3 text-sm mb-2">
-                  <p>
-                    <b>Khách:</b> {room.khach}
-                  </p>
-                  <p>
-                    <b>Phòng ngủ:</b> {room.phongNgu}
-                  </p>
-                  <p>
-                    <b>Giường:</b> {room.giuong}
-                  </p>
-                  <p>
-                    <b>Phòng tắm:</b> {room.phongTam}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-center mt-2">
-                <div className="flex flex-wrap gap-2 text-xs">
-                  {room.wifi && <span className="tag">WiFi</span>}
-                  {room.mayGiat && <span className="tag">Máy giặt</span>}
-                  {room.tivi && <span className="tag">Tivi</span>}
-                  {room.dieuHoa && <span className="tag">Điều hòa</span>}
-                </div>
-
-                <p className="font-semibold">
-                  ${room.giaTien.toLocaleString()}/tháng
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      ))}
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {data.map((booking) => {
+        const room = rooms.get(booking.maPhong);
+        return room && <RoomCard key={booking.id} room={room} compact />;
+      })}
     </div>
   );
 }

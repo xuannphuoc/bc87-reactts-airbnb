@@ -17,7 +17,6 @@ import getLocalIdSlice from "@/pages/HomeTemplate/ListLocal/getAPI/getLocalId.ts
 import bookRoomSlice from "@/pages/HomeTemplate/RoomDetail/getAPI/bookRoom.ts";
 import putUserSlice from "@/pages/User/getAPI/putUser.ts";
 import getUserSlice from "@/pages/User/getAPI/getUser.ts";
-import userRoomsSlice from "@/pages/User/getAPI/roomBooked";
 import roomByUserSlice from "@/pages/User/getAPI/getRoomByUser";
 import putAvatarSlice from "@/pages/User/getAPI/uploadAvatar";
 export const store = configureStore({
@@ -41,7 +40,6 @@ export const store = configureStore({
     roomByUserSlice,
     putUserSlice,
     getUserSlice,
-    userRoomsSlice,
     putAvatarSlice,
   },
 });

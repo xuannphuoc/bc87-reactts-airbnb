@@ -1,3 +1,5 @@
+import { readDemoSession } from "@/services/demoSession";
+import { getUser } from "../getAPI/getUser";
 import { type UserData } from "./../../HomeTemplate/components/_Type/type.tsx";
 import { type AppDispatch, type RootState } from "../../../store";
 import { type PutUser } from "../getAPI/putUser";
@@ -13,18 +15,10 @@ type Props = {
   user?: UserData | null;
 };
 export default function Body({ user }: Props) {
-  const [displayName, setDisplayName] = useState<string>("");
   const dispatch = useDispatch<AppDispatch>();
-  const storedUser =
-    JSON.parse(localStorage.getItem("userLogin") || "null")?.user ||
-    JSON.parse(sessionStorage.getItem("userLogin") || "null")?.user;
-  const currentUser = user || storedUser || null;
-
-  useEffect(() => {
-    if (currentUser?.name) {
-      setDisplayName(currentUser.name);
-    }
-  }, [currentUser]);
+  const [sessionUser] = useState(() => readDemoSession()?.user);
+  const currentUser = user || sessionUser;
+  const currentUserId = currentUser?.id;
   const [formUser, setFormUser] = useState<PutUser>({
     id: 0,
     name: "",
@@ -47,7 +41,7 @@ export default function Body({ user }: Props) {
       phone: currentUser.phone ?? "",
       birthday,
       gender: currentUser.gender ?? true,
-      role: "USER",
+      role: currentUser.role,
     });
   }, [currentUser]);
 
@@ -58,9 +52,13 @@ export default function Body({ user }: Props) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await dispatch(putUserReducer(formUser)).unwrap();
-
-    setDisplayName(formUser.name);
+    try {
+      await dispatch(putUserReducer(formUser)).unwrap();
+      await dispatch(getUser(formUser.id));
+    } catch (error) {
+      void Swal.fire({ icon: "error", text: typeof error === "string" ? error : "Cập nhật thất bại" });
+      return;
+    }
     document.getElementById("flowbite-close-modal")?.click();
     Swal.fire({
       icon: "success",
@@ -71,10 +69,10 @@ export default function Body({ user }: Props) {
 
   // get the booked Room
   useEffect(() => {
-    if (currentUser?.id) {
-      dispatch(getRoomByUser(currentUser.id));
+    if (currentUserId) {
+      dispatch(getRoomByUser(currentUserId));
     }
-  }, [currentUser?.id, dispatch]);
+  }, [currentUserId, dispatch]);
 
   const { data, loading } = useSelector(
     (state: RootState) => state.roomByUserSlice
@@ -84,14 +82,14 @@ export default function Body({ user }: Props) {
       <div className="flex flex-col md:flex-row md:gap-8">
         {/* LEFT - Profile */}
         <div className="md:w-1/4 mb-6 md:mb-0">
-          <UserPicture currentUser={currentUser} />
+          {currentUser && <UserPicture currentUser={currentUser} />}
         </div>
 
         {/* RIGHT - Info + Rooms */}
         <div className="md:w-3/4">
           <div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold">
-              Xin chào tôi là {displayName}
+              Xin chào tôi là {currentUser?.name}
             </h1>
             <p className="text-gray-500 mt-2 text-sm sm:text-base">
               Bắt đầu tham gia vào 2021
@@ -110,7 +108,6 @@ export default function Body({ user }: Props) {
           <div className="m-2">
             <h2 className="text-xl font-semibold mb-4">Phòng bạn đã đặt</h2>
             <RoomCard data={data} loading={loading} />
-            {loading && <p>Đang tải phòng...</p>}
           </div>
         </div>
       </div>

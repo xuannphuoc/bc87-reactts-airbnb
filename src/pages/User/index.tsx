@@ -1,7 +1,8 @@
+import { readDemoSession } from "@/services/demoSession";
 import { useEffect } from "react";
 import Body from "./Body/body";
 import { initFlowbite } from "flowbite";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import type { AppDispatch, RootState } from "@/store/index";
 import { getUser } from "./getAPI/getUser.ts";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,9 +11,7 @@ export default function User() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   // get User
-  const userString =
-    localStorage.getItem("userLogin") || sessionStorage.getItem("userLogin");
-  const id = userString ? JSON.parse(userString).user?.id : null;
+  const id = readDemoSession()?.user.id;
   useEffect(() => {
     if (id) {
       dispatch(getUser(Number(id)));
@@ -33,6 +32,8 @@ export default function User() {
     dispatch(clearUser());
     navigate("/");
   };
+
+  if (!id) return <Navigate to="/" replace />;
 
   const renderIcon = () => {
     return (

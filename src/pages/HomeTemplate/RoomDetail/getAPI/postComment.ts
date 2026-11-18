@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getToken } from "../../components/helper/getToken";
 import type { AxiosError } from "axios";
-import axios from "axios";
+import api from "@/services/apiServices";
 export interface PostComment {
   maPhong: number;
   maNguoiBinhLuan: number;
@@ -27,17 +26,12 @@ export const postComment = createAsyncThunk<any, PostComment>(
   "postCommentReducer",
   async (data, { rejectWithValue }) => {
     try {
-      const response = await axios({
-        url: `https://airbnbnew.cybersoft.edu.vn/api/binh-luan`,
+      const response = await api({
+        url: `binh-luan`,
         method: "POST",
         data,
-        headers: {
-          token: getToken(),
-          tokenCybersoft:
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5Mb3AiOiJCb290Y2FtcCA4NyIsIkhldEhhblN0cmluZyI6IjIzLzAzLzIwMjYiLCJIZXRIYW5UaW1lIjoiMTc3NDIyNDAwMDAwMCIsIm5iZiI6MTc0NzI0MjAwMCwiZXhwIjoxNzc0MzcxNjAwfQ.-W4bvmZuRBJxryMtPHaMnmm11rdGxNTYol7fLRQid1g",
-        },
       });
-      return response.data;
+      return response.data.content;
     } catch (error) {
       return rejectWithValue(error);
     }

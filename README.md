@@ -1,4 +1,33 @@
-# React + TypeScript + Vite
+# BC87 React TypeScript · Đặt phòng demo
+
+Chạy ứng dụng bằng Node.js 20.19+ hoặc 22.12+.
+
+```bash
+npm ci
+npm run dev
+```
+
+| Luồng | Tài khoản | Mật khẩu demo |
+| --- | --- | --- |
+| Khách tại trang chủ | `guest@example.com` | `Demo1234!` |
+| Quản trị tại `/auth` | `admin@example.com` | `Demo1234!` |
+
+Dữ liệu mẫu nằm trong `src/services/demo-data.json`. Thao tác trên ứng dụng được
+lưu bằng `localStorage` theo trình duyệt và địa chỉ chạy ứng dụng. Để khôi phục
+dữ liệu mẫu, xóa khóa `airbnb-demo-db-v1` và các khóa phiên `userLogin`,
+`ADMIN_INFO` trong DevTools rồi tải lại trang. Demo dùng tài khoản giả lập và
+chỉ phù hợp với dữ liệu thử nghiệm.
+
+Trang tổng quan quản trị đọc phòng, vị trí, tài khoản và lượt đặt từ cùng
+nguồn dữ liệu với các trang quản lý. Bảng lượt đặt mới nhất hiển thị theo mã
+đặt phòng giảm dần. Dữ liệu mẫu ban đầu chưa có lượt đặt, bạn có thể thêm một
+lượt tại `/admin/booking` để xem tổng quan cập nhật.
+
+`npm run build` kiểm tra TypeScript và tạo bản phát hành trong `dist/`.
+Khi triển khai, cấu hình máy chủ trả về `index.html` cho các đường dẫn của SPA
+như `/room/1` và `/admin/booking`.
+
+## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

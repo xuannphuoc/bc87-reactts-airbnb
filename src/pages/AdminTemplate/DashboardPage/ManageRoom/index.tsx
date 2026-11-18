@@ -1,3 +1,5 @@
+import AdminHeader from "../../_components/AdminHeader";
+import AdminDialog from "../../_components/AdminDialog";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "./../../../../store/index";
@@ -10,7 +12,7 @@ import {
   clearError,
   type Room,
 } from "./silce";
-import { Modal, Spinner } from "flowbite-react";
+import { Spinner } from "flowbite-react";
 import { HiPlus, HiPencil, HiTrash, HiPhotograph, HiX } from "react-icons/hi";
 
 interface FormErrors {
@@ -27,7 +29,7 @@ interface FormErrors {
 export default function ManageRoom() {
   const dispatch = useDispatch<AppDispatch>();
   const { rooms, isLoading, error } = useSelector(
-    (state: RootState) => state.roomReducer
+    (state: RootState) => state.roomReducer,
   );
 
   const [showModal, setShowModal] = useState(false);
@@ -185,7 +187,7 @@ export default function ManageRoom() {
       ) {
         const error = validateField(
           key,
-          formData[key as keyof typeof formData]
+          formData[key as keyof typeof formData],
         );
         if (error) {
           errors[key as keyof FormErrors] = error;
@@ -258,7 +260,7 @@ export default function ManageRoom() {
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
@@ -281,7 +283,7 @@ export default function ManageRoom() {
   };
 
   const handleBlur = (
-    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
 
@@ -313,7 +315,7 @@ export default function ManageRoom() {
     try {
       if (editingRoom) {
         await dispatch(
-          updateRoom({ id: editingRoom.id, roomData: formData })
+          updateRoom({ id: editingRoom.id, roomData: formData }),
         ).unwrap();
       } else {
         await dispatch(createRoom(formData)).unwrap();
@@ -385,7 +387,7 @@ export default function ManageRoom() {
         const formData = new FormData();
         formData.append("formFile", imageFile);
         await dispatch(
-          uploadRoomImage({ roomId: uploadingRoomId, formData })
+          uploadRoomImage({ roomId: uploadingRoomId, formData }),
         ).unwrap();
         setShowImageModal(false);
         setUploadingRoomId(null);
@@ -399,44 +401,18 @@ export default function ManageRoom() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="bg-white dark:bg-white rounded-lg shadow mb-6 p-6">
-          <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center">
-              <svg
-                className="w-12 h-12 text-rose-600 dark:text-rose-500"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                width={24}
-                height={24}
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M5 5a1 1 0 0 0 1-1 1 1 0 1 1 2 0 1 1 0 0 0 1 1h1a1 1 0 0 0 1-1 1 1 0 1 1 2 0 1 1 0 0 0 1 1h1a1 1 0 0 0 1-1 1 1 0 1 1 2 0 1 1 0 0 0 1 1 2 2 0 0 1 2 2v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a2 2 0 0 1 2-2ZM3 19v-7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Zm6.01-6a1 1 0 1 0-2 0 1 1 0 0 0 2 0Zm2 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0Zm6 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0Zm-10 4a1 1 0 1 1 2 0 1 1 0 0 1-2 0Zm6 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0Zm2 0a1 1 0 1 1 2 0 1 1 0 0 1-2 0Z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <div className="ml-4">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-900">
-                  Quản Lý Phòng
-                </h1>
-                <p className="mt-1 text-sm text-gray-600">
-                  Hệ thống Airbnb Admin
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => handleOpenModal()}
-              className="inline-flex items-center px-4 py-2.5 bg-rose-500 hover:bg-rose-600 text-white font-medium rounded-lg transition-colors duration-200 shadow-sm"
-            >
+    <div>
+      <div>
+        <AdminHeader
+          title="Quản lý phòng"
+          description="Quản lý giá, sức chứa và hình ảnh của từng phòng."
+          action={
+            <button onClick={() => handleOpenModal()} className="admin-primary">
               <HiPlus className="mr-2 h-5 w-5" />
-              Thêm Phòng
+              Thêm phòng
             </button>
-          </div>
-        </div>
+          }
+        />
 
         {error && (
           <div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-4">
@@ -456,10 +432,10 @@ export default function ManageRoom() {
             <Spinner size="xl" color="pink" />
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="overflow-x-auto overflow-y-auto lg:h-[50vh] xl:h-[65vh] ">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200 sticky top-0">
+          <div className="admin-panel overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="admin-table">
+                <thead>
                   <tr>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       ID
@@ -558,31 +534,23 @@ export default function ManageRoom() {
         )}
       </div>
 
-      <Modal show={showModal} onClose={handleCloseModal} size="4xl">
-        <div className="relative bg-white dark:bg-gray-800 rounded-lg">
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {editingRoom ? "Chỉnh sửa phòng" : "Thêm phòng mới"}
-            </h3>
-            <button
-              onClick={handleCloseModal}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg p-2 transition-colors"
-            >
-              <HiX className="h-6 w-6" />
-            </button>
-          </div>
-
+      {showModal && (
+        <AdminDialog
+          title={editingRoom ? "Chỉnh sửa phòng" : "Thêm phòng mới"}
+          onClose={handleCloseModal}
+          wide
+        >
           <form onSubmit={handleSubmit} className="p-6">
             <div className="space-y-6">
               <div>
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">
                   Thông tin cơ bản
                 </h4>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
                     <label
                       htmlFor="tenPhong"
-                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      className="block mb-2 text-sm font-medium text-gray-900"
                     >
                       Tên phòng <span className="text-red-500">*</span>
                     </label>
@@ -595,12 +563,12 @@ export default function ManageRoom() {
                       onBlur={handleBlur}
                       className={`bg-gray-50 border ${
                         touched.tenPhong && formErrors.tenPhong
-                          ? "border-red-500 dark:border-red-500"
-                          : "border-gray-300 dark:border-gray-600"
-                      } text-gray-900 dark:text-white text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5 dark:bg-gray-700 dark:placeholder-gray-400`}
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      } text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
                     />
                     {touched.tenPhong && formErrors.tenPhong && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      <p className="mt-1 text-sm text-red-600">
                         {formErrors.tenPhong}
                       </p>
                     )}
@@ -608,7 +576,7 @@ export default function ManageRoom() {
                   <div>
                     <label
                       htmlFor="giaTien"
-                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      className="block mb-2 text-sm font-medium text-gray-900"
                     >
                       Giá tiền ($/đêm) <span className="text-red-500">*</span>
                     </label>
@@ -621,12 +589,12 @@ export default function ManageRoom() {
                       onBlur={handleBlur}
                       className={`bg-gray-50 border ${
                         touched.giaTien && formErrors.giaTien
-                          ? "border-red-500 dark:border-red-500"
-                          : "border-gray-300 dark:border-gray-600"
-                      } text-gray-900 dark:text-white text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5 dark:bg-gray-700 dark:placeholder-gray-400`}
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      } text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
                     />
                     {touched.giaTien && formErrors.giaTien && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      <p className="mt-1 text-sm text-red-600">
                         {formErrors.giaTien}
                       </p>
                     )}
@@ -635,14 +603,14 @@ export default function ManageRoom() {
               </div>
 
               <div>
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">
                   Chi tiết phòng
                 </h4>
                 <div className="grid grid-cols-4 gap-4">
                   <div>
                     <label
                       htmlFor="khach"
-                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      className="block mb-2 text-sm font-medium text-gray-900"
                     >
                       Số khách <span className="text-red-500">*</span>
                     </label>
@@ -655,12 +623,12 @@ export default function ManageRoom() {
                       onBlur={handleBlur}
                       className={`bg-gray-50 border ${
                         touched.khach && formErrors.khach
-                          ? "border-red-500 dark:border-red-500"
-                          : "border-gray-300 dark:border-gray-600"
-                      } text-gray-900 dark:text-white text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5 dark:bg-gray-700 dark:placeholder-gray-400`}
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      } text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
                     />
                     {touched.khach && formErrors.khach && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      <p className="mt-1 text-sm text-red-600">
                         {formErrors.khach}
                       </p>
                     )}
@@ -668,7 +636,7 @@ export default function ManageRoom() {
                   <div>
                     <label
                       htmlFor="phongNgu"
-                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      className="block mb-2 text-sm font-medium text-gray-900"
                     >
                       Phòng ngủ <span className="text-red-500">*</span>
                     </label>
@@ -681,12 +649,12 @@ export default function ManageRoom() {
                       onBlur={handleBlur}
                       className={`bg-gray-50 border ${
                         touched.phongNgu && formErrors.phongNgu
-                          ? "border-red-500 dark:border-red-500"
-                          : "border-gray-300 dark:border-gray-600"
-                      } text-gray-900 dark:text-white text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5 dark:bg-gray-700 dark:placeholder-gray-400`}
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      } text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
                     />
                     {touched.phongNgu && formErrors.phongNgu && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      <p className="mt-1 text-sm text-red-600">
                         {formErrors.phongNgu}
                       </p>
                     )}
@@ -694,7 +662,7 @@ export default function ManageRoom() {
                   <div>
                     <label
                       htmlFor="giuong"
-                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      className="block mb-2 text-sm font-medium text-gray-900"
                     >
                       Số giường <span className="text-red-500">*</span>
                     </label>
@@ -707,12 +675,12 @@ export default function ManageRoom() {
                       onBlur={handleBlur}
                       className={`bg-gray-50 border ${
                         touched.giuong && formErrors.giuong
-                          ? "border-red-500 dark:border-red-500"
-                          : "border-gray-300 dark:border-gray-600"
-                      } text-gray-900 dark:text-white text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5 dark:bg-gray-700 dark:placeholder-gray-400`}
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      } text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
                     />
                     {touched.giuong && formErrors.giuong && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      <p className="mt-1 text-sm text-red-600">
                         {formErrors.giuong}
                       </p>
                     )}
@@ -720,7 +688,7 @@ export default function ManageRoom() {
                   <div>
                     <label
                       htmlFor="phongTam"
-                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      className="block mb-2 text-sm font-medium text-gray-900"
                     >
                       Phòng tắm <span className="text-red-500">*</span>
                     </label>
@@ -733,12 +701,12 @@ export default function ManageRoom() {
                       onBlur={handleBlur}
                       className={`bg-gray-50 border ${
                         touched.phongTam && formErrors.phongTam
-                          ? "border-red-500 dark:border-red-500"
-                          : "border-gray-300 dark:border-gray-600"
-                      } text-gray-900 dark:text-white text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5 dark:bg-gray-700 dark:placeholder-gray-400`}
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      } text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
                     />
                     {touched.phongTam && formErrors.phongTam && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                      <p className="mt-1 text-sm text-red-600">
                         {formErrors.phongTam}
                       </p>
                     )}
@@ -749,7 +717,7 @@ export default function ManageRoom() {
               <div>
                 <label
                   htmlFor="maViTri"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  className="block mb-2 text-sm font-medium text-gray-900"
                 >
                   Mã vị trí <span className="text-red-500">*</span>
                 </label>
@@ -762,12 +730,12 @@ export default function ManageRoom() {
                   onBlur={handleBlur}
                   className={`bg-gray-50 border ${
                     touched.maViTri && formErrors.maViTri
-                      ? "border-red-500 dark:border-red-500"
-                      : "border-gray-300 dark:border-gray-600"
-                  } text-gray-900 dark:text-white text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5 dark:bg-gray-700 dark:placeholder-gray-400`}
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
                 />
                 {touched.maViTri && formErrors.maViTri && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  <p className="mt-1 text-sm text-red-600">
                     {formErrors.maViTri}
                   </p>
                 )}
@@ -777,7 +745,7 @@ export default function ManageRoom() {
               <div>
                 <label
                   htmlFor="moTa"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  className="block mb-2 text-sm font-medium text-gray-900"
                 >
                   Mô tả <span className="text-red-500">*</span>
                 </label>
@@ -791,19 +759,17 @@ export default function ManageRoom() {
                   placeholder="Nhập mô tả chi tiết về phòng..."
                   className={`bg-gray-50 border ${
                     touched.moTa && formErrors.moTa
-                      ? "border-red-500 dark:border-red-500"
-                      : "border-gray-300 dark:border-gray-600"
-                  } text-gray-900 dark:text-white text-sm rounded-lg focus:ring-rose-500 focus:border-rose-500 block w-full p-2.5 dark:bg-gray-700 dark:placeholder-gray-400`}
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5`}
                 />
                 {touched.moTa && formErrors.moTa && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                    {formErrors.moTa}
-                  </p>
+                  <p className="mt-1 text-sm text-red-600">{formErrors.moTa}</p>
                 )}
               </div>
 
               <div>
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">
                   Tiện nghi
                 </h4>
                 <div className="grid grid-cols-3 gap-4">
@@ -829,11 +795,11 @@ export default function ManageRoom() {
                           ] as boolean
                         }
                         onChange={handleInputChange}
-                        className="w-4 h-4 text-rose-600 bg-gray-100 border-gray-300 rounded focus:ring-rose-500 dark:focus:ring-rose-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                        className="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500 focus:ring-2"
                       />
                       <label
                         htmlFor={amenity.id}
-                        className="ml-2 text-sm text-gray-900 dark:text-gray-300"
+                        className="ml-2 text-sm text-gray-900"
                       >
                         {amenity.label}
                       </label>
@@ -843,7 +809,7 @@ export default function ManageRoom() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
               <button
                 type="button"
                 onClick={handleCloseModal}
@@ -854,92 +820,76 @@ export default function ManageRoom() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-5 py-2.5 text-sm font-medium admin-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading && <Spinner size="sm" className="mr-2" />}
                 {editingRoom ? "Cập nhật" : "Thêm phòng"}
               </button>
             </div>
           </form>
-        </div>
-      </Modal>
+        </AdminDialog>
+      )}
 
-      <Modal
-        show={showDeleteModal}
-        size="md"
-        onClose={() => setShowDeleteModal(false)}
-      >
-        <div className="relative bg-white dark:bg-gray-800 rounded-lg p-6">
-          <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/20 mb-4">
-              <HiTrash className="h-6 w-6 text-red-600 dark:text-red-500" />
-            </div>
-            <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
-              Xác nhận xóa phòng
-            </h3>
-            <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">
-              Bạn có chắc chắn muốn xóa phòng này không? Hành động này không thể
-              hoàn tác.
-            </p>
-            <div className="flex justify-center gap-3">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-              >
-                Hủy
-              </button>
-              <button
-                onClick={handleDeleteConfirm}
-                disabled={isLoading}
-                className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
-              >
-                {isLoading && <Spinner size="sm" className="mr-2" />}
-                Xóa phòng
-              </button>
+      {showDeleteModal && (
+        <AdminDialog
+          title="Xác nhận xóa phòng"
+          onClose={() => setShowDeleteModal(false)}
+        >
+          <div className="relative bg-white rounded-lg p-6">
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                <HiTrash className="h-6 w-6 text-red-600" />
+              </div>
+              <p className="mb-6 text-sm text-gray-500">
+                Bạn có chắc chắn muốn xóa phòng này không? Hành động này không
+                thể hoàn tác.
+              </p>
+              <div className="flex justify-center gap-3">
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Hủy
+                </button>
+                <button
+                  onClick={handleDeleteConfirm}
+                  disabled={isLoading}
+                  className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                >
+                  {isLoading && <Spinner size="sm" className="mr-2" />}
+                  Xóa phòng
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </Modal>
+        </AdminDialog>
+      )}
 
-      <Modal
-        show={showImageModal}
-        onClose={() => setShowImageModal(false)}
-        size="lg"
-      >
-        <div className="relative bg-white dark:bg-gray-800 rounded-lg">
-          {/* Modal Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-              Tải ảnh phòng
-            </h3>
-            <button
-              onClick={() => setShowImageModal(false)}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg p-2 transition-colors"
-            >
-              <HiX className="h-5 w-5" />
-            </button>
-          </div>
-
+      {showImageModal && (
+        <AdminDialog
+          title="Tải ảnh phòng"
+          onClose={() => setShowImageModal(false)}
+        >
           <div className="p-6">
             <div className="space-y-4">
               <div>
                 <label
                   htmlFor="image"
-                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  className="block mb-2 text-sm font-medium text-gray-900"
                 >
                   Chọn ảnh <span className="text-red-500">*</span>
                 </label>
                 <div className="flex items-center justify-center w-full">
                   <label
                     htmlFor="image"
-                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors"
                   >
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <HiPhotograph className="w-10 h-10 mb-2 text-gray-400 dark:text-gray-500" />
-                      <p className="mb-1 text-sm text-gray-500 dark:text-gray-400">
+                      <HiPhotograph className="w-10 h-10 mb-2 text-gray-400" />
+                      <p className="mb-1 text-sm text-gray-500">
                         <span className="font-semibold">Click để tải ảnh</span>
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-gray-500">
                         PNG, JPG, GIF hoặc WEBP (MAX. 5MB)
                       </p>
                     </div>
@@ -965,33 +915,33 @@ export default function ManageRoom() {
                       setImageFile(null);
                       setImagePreview("");
                     }}
-                    className="absolute top-2 right-2 p-1.5 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow-lg hover:bg-gray-100 transition-colors"
                   >
-                    <HiX className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                    <HiX className="h-4 w-4 text-gray-600" />
                   </button>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex justify-end gap-3 p-6 border-t border-gray-200">
             <button
               onClick={() => setShowImageModal(false)}
-              className="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+              className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Hủy
             </button>
             <button
               onClick={handleImageUpload}
               disabled={!imageFile || isLoading}
-              className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-rose-500 rounded-lg hover:bg-rose-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center px-5 py-2.5 text-sm font-medium admin-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading && <Spinner size="sm" className="mr-2" />}
               Tải lên
             </button>
           </div>
-        </div>
-      </Modal>
+        </AdminDialog>
+      )}
     </div>
   );
 }
